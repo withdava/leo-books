@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Книжки Лео · Leo's Books</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;800;900&display=swap" rel="stylesheet">
+<style>
+/* VOICE: cheerful family bookshelf and reader for a 3-year-old
+   IDEA: a toy shelf of animated board books, four languages
+   PICTURE: sky banner with the whole gang, live covers, animated pages
+   COLOUR and TYPE: sky blue, sunny yellow, cherry red; Nunito rounded
+   LAYOUT: banner, language chips, book cards; reader = scene, text, big buttons */
+
+
+:root{color-scheme:light dark;--bg:light-dark(#fdf0d2,#1c2042);--ink:#2b2340;--page:#fffaf0;--sun:#ffc93c;--red:#e8433f}
+:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:var(--bg);color:var(--ink);font:600 17px/1.55 Nunito,"Trebuchet MS",system-ui,sans-serif;overflow-x:clip;-webkit-tap-highlight-color:transparent}
+.book{max-width:780px;margin:0 auto;padding:clamp(10px,3vw,28px) clamp(10px,3vw,20px) 28px}
+.page{background:var(--page);border-radius:28px;box-shadow:0 2px 0 #e9d6ab,0 18px 40px -18px rgba(60,40,10,.45);overflow:hidden}
+.page.turn{animation:turn .45s ease-out}
+@keyframes turn{from{opacity:0;transform:translateX(var(--from,30px)) rotate(var(--rot,1deg))}to{opacity:1;transform:none}}
+.stage{position:relative;aspect-ratio:4/3;background:#bfe6ff;touch-action:pan-y;user-select:none}
+.stage svg{position:absolute;inset:0;width:100%;height:100%;display:block}
+.stage text{font-family:Nunito,sans-serif}
+.buzzTxt{white-space:nowrap;position:absolute;left:50%;top:12px;transform:translateX(-50%);background:#fff;border:3px solid var(--ink);border-radius:999px;padding:4px 18px;font:900 clamp(22px,5vw,32px)/1.2 Nunito,sans-serif;color:var(--ink);opacity:0;pointer-events:none}
+.buzzTxt.on{animation:bz .9s ease-out}
+@keyframes bz{0%{opacity:0;transform:translate(-50%,10px) scale(.6)}20%{opacity:1;transform:translate(-50%,0) scale(1.1)}75%{opacity:1}100%{opacity:0;transform:translate(-50%,-14px) scale(1)}}
+.txt{padding:clamp(16px,3vw,26px) clamp(18px,4vw,34px) 8px;font-size:clamp(19px,2.7vw,23px);line-height:1.5;min-height:8.5em}
+.txt p{margin:0 0 .45em}
+.txt .say{color:#c2410c;font-weight:800}
+.txt h1{font-size:clamp(36px,7vw,52px);line-height:1.05;margin:.1em 0 .2em;font-weight:900;text-wrap:balance}
+.txt .sub{font-size:clamp(17px,2.4vw,20px);opacity:.8}
+.hint{display:inline-block;margin-top:.5em;background:var(--sun);border-radius:999px;padding:4px 14px;font-weight:800;font-size:17px}
+nav{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px clamp(14px,3vw,26px) clamp(16px,3vw,24px)}
+nav button{flex:none;width:66px;height:66px;border-radius:50%;border:0;background:var(--sun);color:var(--ink);box-shadow:0 5px 0 #d98e04;cursor:pointer;display:grid;place-items:center;transition:transform .1s}
+nav button:active{transform:translateY(4px);box-shadow:0 1px 0 #d98e04}
+nav button:disabled{opacity:.3;cursor:default}
+nav button:focus-visible{outline:4px solid #3d7be0;outline-offset:3px}
+nav button.again{background:var(--red);color:#fff;box-shadow:0 5px 0 #a3201d}
+.dots{display:flex;gap:7px;flex-wrap:wrap;justify-content:center}
+.dots i{width:11px;height:11px;border-radius:50%;background:#e6d3a8}
+.dots i.on{background:var(--red);transform:scale(1.25)}
+.note{text-align:center;font-size:14px;opacity:.7;margin-top:14px;color:light-dark(#5a4a2a,#c9c4e8)}
+/* scene motion */
+.zh{animation:bob 1.6s ease-in-out infinite;cursor:pointer}
+.zh.shake{animation:shake .6s linear}
+.zh.sleep{animation:breathe 3.2s ease-in-out infinite}
+.prop{transform-box:fill-box;transform-origin:center;animation:spin .14s linear infinite}
+.sleep .prop{animation:none}
+.eye{transform-box:fill-box;transform-origin:center;animation:blink 4s infinite}
+.led{animation:led 1.2s ease-in-out infinite}
+.sleep .led{animation:none;opacity:.35}
+@keyframes bob{50%{transform:translateY(-7px)}}
+@keyframes breathe{50%{transform:translateY(2px) scaleY(.98)}}
+@keyframes shake{0%,100%{transform:none}20%{transform:translate(-5px,-4px) rotate(-6deg)}40%{transform:translate(5px,-8px) rotate(6deg)}60%{transform:translate(-4px,-4px) rotate(-4deg)}80%{transform:translate(3px,-2px) rotate(3deg)}}
+@keyframes spin{50%{transform:scaleX(.2)}}
+@keyframes blink{0%,93%,100%{transform:scaleY(1)}96%{transform:scaleY(.1)}}
+@keyframes led{50%{opacity:.35}}
+.rise{animation:rise 2.6s cubic-bezier(.2,.7,.3,1) both}
+@keyframes rise{from{transform:translate(-120px,150px)}to{transform:none}}
+.twirl{transform-box:fill-box;transform-origin:center;animation:twirl 2.4s ease-in-out infinite}
+@keyframes twirl{0%{transform:rotate(0)}55%,100%{transform:rotate(360deg)}}
+.escape{animation:escape 3s ease-in-out infinite}
+@keyframes escape{0%,30%{transform:translate(-30px,40px)}50%,85%{transform:translate(0,-30px)}100%{transform:translate(-30px,40px)}}
+.paw{transform-origin:12px -34px;animation:paw 3s ease-in-out infinite}
+@keyframes paw{0%,15%{transform:rotate(50deg)}35%{transform:rotate(-10deg)}50%,100%{transform:rotate(50deg)}}
+.tail{transform-origin:18px -6px;animation:tail 1.4s ease-in-out infinite}
+@keyframes tail{50%{transform:rotate(14deg)}}
+.approach{animation:approach 2s ease-out both}
+@keyframes approach{from{transform:translateX(160px)}to{transform:none}}
+.nudge{animation:nudge 1.2s ease-in-out both}
+@keyframes nudge{0%{transform:translate(60px,-10px)}45%{transform:translate(-14px,6px)}60%,100%{transform:none}}
+.fall{animation:fall 1.1s cubic-bezier(.5,0,.6,1) .5s both}
+@keyframes fall{0%{transform:translate(-140px,-47px)}70%{transform:translate(-30px,-8px)}85%{transform:translate(-6px,-14px)}100%{transform:none}}
+.jump{animation:jump .7s ease-in-out 1.7s infinite}
+@keyframes jump{50%{transform:translateY(-16px)}}
+.wobble{transform-box:fill-box;transform-origin:center;animation:wobble 1s ease-in-out infinite}
+@keyframes wobble{50%{transform:rotate(14deg)}}
+.tear{animation:tear 1.2s ease-in infinite}
+.tear.b{animation-delay:.6s}
+@keyframes tear{0%{transform:none;opacity:1}100%{transform:translateY(22px);opacity:0}}
+.wing{transform-box:fill-box;transform-origin:85% 40%;animation:flap .35s ease-in-out infinite}
+@keyframes flap{50%{transform:rotate(-28deg)}}
+.hop{animation:hop .5s ease-in-out infinite}
+@keyframes hop{50%{transform:translateY(-8px)}}
+.drift{animation:drift 18s linear infinite alternate}
+.drift.b{animation-duration:24s;animation-direction:alternate-reverse}
+@keyframes drift{to{transform:translateX(50px)}}
+.rays{transform-box:fill-box;transform-origin:center;animation:rays 16s linear infinite}
+@keyframes rays{to{transform:rotate(360deg)}}
+.pop{transform-box:fill-box;transform-origin:center bottom;animation:pop .45s cubic-bezier(.3,1.6,.6,1) both}
+@keyframes pop{from{transform:scale(0);opacity:0}to{transform:none;opacity:1}}
+.zzz{animation:zzz 3s ease-in infinite both}
+@keyframes zzz{0%{transform:none;opacity:0}20%{opacity:1}100%{transform:translate(26px,-60px);opacity:0}}
+.tw{transform-box:fill-box;transform-origin:center;animation:tw 2s ease-in-out infinite}
+@keyframes tw{50%{transform:scale(.4);opacity:.4}}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important}}
+
+.tk{cursor:pointer}.tk.shake{animation:shake .6s linear}
+.hop2{animation:hop2 .9s ease-in-out infinite}@keyframes hop2{50%{transform:translateY(-10px)}}
+.wheel{transform-box:fill-box;transform-origin:center;animation:rays .5s linear infinite}
+.scroll{animation:scroll 5s linear infinite}@keyframes scroll{to{transform:translateX(-400px)}}
+.dash{animation:dash .6s linear infinite}@keyframes dash{to{stroke-dashoffset:36}}
+.ride{animation:ride .4s ease-in-out infinite}@keyframes ride{50%{transform:translateY(-2px)}}
+.down{animation:down 4s linear infinite}@keyframes down{from{transform:translateX(-90px)}to{transform:translateX(520px)}}
+.rise2{animation:rise2 2s cubic-bezier(.2,.7,.3,1) both}@keyframes rise2{from{transform:translateY(130px)}to{transform:none}}
+.orbit{transform-origin:0px 0px;animation:rays 5s linear infinite}
+.orbitR{transform-box:fill-box;transform-origin:center;animation:unrot 5s linear infinite}@keyframes unrot{to{transform:rotate(-360deg)}}
+.wave{animation:wave 1.6s ease-in-out infinite alternate}@keyframes wave{to{transform:translateX(-30px)}}
+.drop{animation:drop 1.2s ease-out infinite}@keyframes drop{0%{transform:none;opacity:0}20%{opacity:1}100%{transform:translate(var(--dx),var(--dy));opacity:0}}
+.float{animation:float 1.8s ease-in-out infinite}@keyframes float{50%{transform:translateY(-4px) rotate(-4deg)}}
+.beat{transform-box:fill-box;transform-origin:center;animation:beat 1.1s ease-in-out infinite}@keyframes beat{0%,100%{transform:scale(1)}15%{transform:scale(1.15)}30%{transform:scale(1)}45%{transform:scale(1.1)}}
+.flyR{animation:flyR 9s linear infinite}@keyframes flyR{from{transform:translateX(-80px)}to{transform:translateX(480px)}}
+.flyL{animation:flyL 8s linear infinite}@keyframes flyL{from{transform:translateX(480px)}to{transform:translateX(-80px)}}
+.swing{transform-origin:0px 0px;animation:swing 1.4s ease-in-out infinite alternate}@keyframes swing{from{transform:rotate(-20deg)}to{transform:rotate(20deg)}}
+.pass{animation:pass 2s ease-in-out infinite alternate}@keyframes pass{0%{transform:none}50%{transform:translate(50px,-40px)}100%{transform:translate(100px,0)}}
+.pant{transform-box:fill-box;transform-origin:center top;animation:pant .5s ease-in-out infinite}@keyframes pant{50%{transform:scaleY(.7)}}
+.dtail{transform-origin:-38px -48px;animation:dtail .5s ease-in-out infinite alternate}@keyframes dtail{to{transform:rotate(22deg)}}
+.credit{margin-top:1.4em!important;font-size:11px;font-weight:600;opacity:.28;text-align:right}
+.page{position:relative}
+.snd{position:absolute;top:12px;right:12px;z-index:3;width:50px;height:50px;border-radius:50%;border:3px solid var(--ink);background:#fff;color:var(--ink);display:grid;place-items:center;cursor:pointer;box-shadow:0 3px 0 rgba(0,0,0,.18)}
+.snd:focus-visible{outline:4px solid #3d7be0;outline-offset:3px}
+.snd .x{display:none}.snd.off .x{display:block}.snd.off .w{display:none}.snd.off{background:#eee}
+
+[hidden]{display:none!important}
+.hero{position:relative;height:clamp(190px,32vw,300px);width:100%;background:#a9dcff;overflow:hidden;border-radius:0 0 34px 34px}
+.hero svg{position:absolute;inset:0;width:100%;height:100%}
+.wrap{max-width:900px;margin:0 auto;padding:0 clamp(12px,3vw,24px) 36px}
+.home h1{font-size:clamp(36px,7vw,54px);line-height:1.05;font-weight:900;margin:22px 0 6px;text-wrap:balance}
+.lead{margin:0 0 16px;font-size:clamp(17px,2.4vw,20px);opacity:.8}
+.langbar{display:flex;flex-wrap:wrap;gap:10px;margin:0 0 22px}
+.langbar button{min-height:50px;padding:0 18px;border-radius:999px;border:3px solid var(--ink);background:#fff;color:var(--ink);font:800 17px Nunito,system-ui,sans-serif;cursor:pointer;display:inline-flex;align-items:center;gap:8px}
+.langbar button b{font-size:12px;background:var(--ink);color:#fff;border-radius:6px;padding:1px 5px}
+.langbar button[aria-pressed=true]{background:var(--sun);box-shadow:0 4px 0 #d98e04}
+.langbar button:focus-visible,.card:focus-visible,.homeBtn:focus-visible{outline:4px solid #3d7be0;outline-offset:3px}
+.shelf{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,270px),1fr));gap:18px}
+.card{background:var(--page);border-radius:26px;overflow:hidden;box-shadow:0 2px 0 #e9d6ab,0 16px 34px -18px rgba(60,40,10,.45);display:flex;flex-direction:column;color:inherit;text-decoration:none;cursor:pointer;transition:transform .15s}
+.card:active{transform:scale(.98)}
+.cover{position:relative;aspect-ratio:4/3;background:#bfe6ff}.cover svg{position:absolute;inset:0;width:100%;height:100%}
+.card h2{font-size:24px;line-height:1.1;margin:14px 18px 4px;font-weight:900}
+.card p{margin:0 18px 12px;font-size:16px;opacity:.75}
+.card .go{margin:auto 18px 18px;align-self:flex-start;display:inline-flex;align-items:center;min-height:46px;padding:0 20px;border-radius:999px;background:var(--sun);font-weight:900;box-shadow:0 4px 0 #d98e04}
+.foot{margin-top:24px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font-size:14px;opacity:.7}
+.credit{font-size:11px!important;font-weight:600;opacity:.28;text-align:right}
+.txt .credit{margin-top:1.2em}
+.rbar{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--page)}.rtitle{flex:1;text-align:center;font-weight:900;font-size:18px;line-height:1.1;text-wrap:balance}.stagewrap{position:relative}.rbar .snd{position:static;flex:none}
+.homeBtn{flex:none;width:50px;height:50px;border-radius:50%;border:3px solid var(--ink);background:#fff;color:var(--ink);display:grid;place-items:center;cursor:pointer;box-shadow:0 3px 0 rgba(0,0,0,.18)}
+.book{padding-top:clamp(10px,3vw,28px)}
+</style></head><body>
+<section class="home" id="home">
+  <div class="hero" id="hero"></div>
+  <main class="wrap">
+    <h1 id="hTitle"></h1>
+    <p class="lead" id="hLead"></p>
+    <div class="langbar" id="langbar" role="group"></div>
+    <div class="shelf" id="shelf"></div>
+    <div class="foot"><span id="hTip"></span><span class="credit" id="hCredit"></span></div>
+  </main>
+</section>
+<main class="book" id="reader" hidden>
+  <article class="page" id="page">
+    <div class="rbar"><button class="homeBtn" id="homeBtn"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h5v-6h4v6h5V10"/></svg></button><span class="rtitle" id="rtitle"></span>
+    <button class="snd" id="snd"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9h4l5-4v14l-5-4H4z" fill="currentColor"/><path class="w" d="M16 9a4 4 0 0 1 0 6M18.5 6.5a7.5 7.5 0 0 1 0 11"/><path class="x" d="M16.5 9.5l5 5M21.5 9.5l-5 5"/></svg></button></div>
+    <div class="stagewrap"><div class="stage" id="stage" aria-live="polite"></div>
+    <div class="buzzTxt" id="bz" aria-hidden="true"></div></div>
+    <div class="txt" id="txt"></div>
+    <nav>
+      <button id="prev"><svg width="30" height="30" viewBox="0 0 24 24"><path d="M15 4 7 12l8 8" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <div class="dots" id="dots"></div>
+      <button id="next"></button>
+    </nav>
+  </article>
+  <p class="note" id="note"></p>
+</main>
+<script>
+{
+const $=id=>document.getElementById(id);
+const stage=$('stage'),txt=$('txt'),page=$('page'),dots=$('dots'),prev=$('prev'),next=$('next'),bz=$('bz');
+const INK='#2b2340',ARM='#6b5b7a';
+const ARROW='<svg width="30" height="30" viewBox="0 0 24 24"><path d="M9 4l8 8-8 8" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+const AGAIN='<svg width="32" height="32" viewBox="0 0 24 24"><path d="M4 12a8 8 0 1 0 2.5-5.8M4 4v4.5h4.5" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+const LANGS=[['ru','RU','Русский'],['it','IT','Italiano'],['en','EN','English'],['es','ES','Español']];
+const UIS={
+ ru:{title:'Книжки Лео',lead:'Мультики-книжки про Лео, Ромео и дрончика Жужу. Выбери язык и историю!',read:'Читать',tip:'Листай кнопками или пальцем, нажимай на героев.',credit:'Сделал David Davliatov',
+   note:'Листайте кнопками или пальцем. Нажмите на героев. Музыку можно выключить кнопкой с динамиком.',prev:'Назад',next:'Дальше',again:'Читать сначала',home:'К книжкам',snd:['Выключить звук','Включить звук'],pic:'Картинка к странице',hi:'Привет! Я',buzz:'Жжжж! Я',langs:'Язык',
+   books:{zhuzha:['Дрончик Жужа','Маленький дрон летает, кружится и помогает мальчику достать мячик.'],lr:['Лео и Ромео','Лучшие друзья катаются на байках, запускают дроны и плещутся в бассейне.'],lw:['Лео ждёт Ромео','Ромео уехал в Италию и звонит Лео из поезда, а Лео ждёт друга обратно.']}},
+ it:{title:'I libri di Leo',lead:'Libri animati su Leo, Romeo e il dronetto Zuzù. Scegli la lingua e la storia!',read:'Leggi',tip:'Sfoglia con i pulsanti o con il dito, tocca i personaggi.',credit:'Fatto da David Davliatov',
+   note:'Sfoglia con i pulsanti o con il dito. Tocca i personaggi. La musica si spegne con il pulsante dell’altoparlante.',prev:'Indietro',next:'Avanti',again:'Leggi da capo',home:'Ai libri',snd:['Disattiva audio','Attiva audio'],pic:'Illustrazione della pagina',hi:'Ciao! Sono',buzz:'Bzzz! Sono',langs:'Lingua',
+   books:{zhuzha:['Il dronetto Zuzù','Un piccolo drone vola, fa giravolte e aiuta un bambino a riprendere la palla.'],lr:['Leo e Romeo','Due migliori amici vanno in bici, fanno volare i droni e giocano in piscina.'],lw:['Leo aspetta Romeo','Romeo è partito per l’Italia e chiama Leo dal treno, e Leo aspetta il suo amico.']}},
+ en:{title:'Leo’s Books',lead:'Animated picture books about Leo, Romeo and Zhuzha the little drone. Pick a language and a story!',read:'Read',tip:'Turn pages with the buttons or a swipe, and tap the characters.',credit:'Made by David Davliatov',
+   note:'Turn the pages with the buttons or a swipe. Tap the characters. The speaker button turns the music off.',prev:'Back',next:'Next',again:'Read again',home:'To the books',snd:['Turn sound off','Turn sound on'],pic:'Picture for page',hi:'Hi! I’m',buzz:'Bzzz! I’m',langs:'Language',
+   books:{zhuzha:['Zhuzha the Little Drone','A little drone flies, spins and helps a boy get his ball back.'],lr:['Leo and Romeo','Best friends ride bikes, fly drones and splash in the pool.'],lw:['Leo Waits for Romeo','Romeo moves to Italy and calls Leo from a train, and Leo waits for his friend.']}},
+ es:{title:'Los libros de Leo',lead:'Libros animados de Leo, Romeo y el pequeño dron Zuzú. ¡Elige el idioma y el cuento!',read:'Leer',tip:'Pasa las páginas con los botones o con el dedo y toca a los personajes.',credit:'Hecho por David Davliatov',
+   note:'Pasa las páginas con los botones o con el dedo. Toca a los personajes. El botón del altavoz apaga la música.',prev:'Atrás',next:'Siguiente',again:'Leer otra vez',home:'A los libros',snd:['Quitar sonido','Poner sonido'],pic:'Dibujo de la página',hi:'¡Hola! Soy',buzz:'¡Bzzz! Soy',langs:'Idioma',
+   books:{zhuzha:['Zuzú, el pequeño dron','Un pequeño dron vuela, da vueltas y ayuda a un niño a recuperar su pelota.'],lr:['Leo y Romeo','Dos mejores amigos montan en bici, vuelan drones y chapotean en la piscina.'],lw:['Leo espera a Romeo','Romeo se va a Italia y llama a Leo desde el tren, y Leo espera a su amigo.']}}};
+let LANG='ru';
+try{const s=localStorage.getItem('leoLang');if(UIS[s])LANG=s;else{const n=(navigator.language||'').slice(0,2);if(UIS[n])LANG=n;}}catch(e){}
+const UI=()=>UIS[LANG];
+const DICT={"Вжух!": {"it": "Vuuush!", "en": "Whoosh!", "es": "¡Zuuum!"}, "Чик-чирик! Ты кто?": {"it": "Cip-cip! Chi sei?", "en": "Tweet! Who are you?", "es": "¡Pío-pío! ¿Quién eres?"}, "Я Жужа! Жжжж!": {"it": "Sono Zuzù! Bzzz!", "en": "I’m Zhuzha! Bzzz!", "es": "¡Soy Zuzú! ¡Bzzz!"}, "Ха-ха-ха!": {"it": "Ah-ah-ah!", "en": "Ha-ha-ha!", "es": "¡Ja-ja-ja!"}, "Раз, два, три!": {"it": "Uno, due, tre!", "en": "One, two, three!", "es": "¡Uno, dos, tres!"}, "Мяу! Ты муха?": {"it": "Miao! Sei una mosca?", "en": "Meow! Are you a fly?", "es": "¡Miau! ¿Eres una mosca?"}, "Не плачь! Я помогу!": {"it": "Non piangere! Ti aiuto!", "en": "Don’t cry! I’ll help!", "es": "¡No llores! ¡Te ayudo!"}, "Уа-уа!": {"it": "Uè-uè!", "en": "Waah!", "es": "¡Buaa!"}, "Тук!": {"it": "Toc!", "en": "Bonk!", "es": "¡Toc!"}, "Ура! Спасибо!": {"it": "Evviva! Grazie!", "en": "Yay! Thank you!", "es": "¡Bien! ¡Gracias!"}, "Привет, Ромео!": {"it": "Ciao, Romeo!", "en": "Hi, Romeo!", "es": "¡Hola, Romeo!"}, "Привет, Лео!": {"it": "Ciao, Leo!", "en": "Hi, Leo!", "es": "¡Hola, Leo!"}, "Дзынь-дзынь!": {"it": "Drin-drin!", "en": "Ring-ring!", "es": "¡Rin-rin!"}, "Ура-а-а!": {"it": "Evviva!", "en": "Wheee!", "es": "¡Yupiii!"}, "Вжик!": {"it": "Ziiip!", "en": "Zoom!", "es": "¡Zas!"}, "Полетели!": {"it": "Si vola!", "en": "Let’s fly!", "es": "¡A volar!"}, "Ха-ха!": {"it": "Ah-ah!", "en": "Ha-ha!", "es": "¡Ja-ja!"}, "Плюх!": {"it": "Splash!", "en": "Splash!", "es": "¡Chof!"}, "Кря-кря!": {"it": "Qua-qua!", "en": "Quack-quack!", "es": "¡Cua-cua!"}, "Завтра поиграем?": {"it": "Domani giochiamo?", "en": "Play tomorrow?", "es": "¿Jugamos mañana?"}, "Конечно!": {"it": "Certo!", "en": "Of course!", "es": "¡Claro!"}, "Пока, Ромео!": {"it": "Ciao, Romeo!", "en": "Bye, Romeo!", "es": "¡Adiós, Romeo!"}, "Чао!": {"it": "Ciao!", "en": "Ciao!", "es": "¡Ciao!"}, "Ромео, я жду тебя!": {"it": "Romeo, ti aspetto!", "en": "Romeo, I’ll wait!", "es": "¡Romeo, te espero!"}, "Гол!": {"it": "Gol!", "en": "Goal!", "es": "¡Gol!"}, "Пас!": {"it": "Passa!", "en": "Pass!", "es": "¡Pasa!"}, "Чух-чух!": {"it": "Ciuf-ciuf!", "en": "Choo-choo!", "es": "¡Chu-chu!"}, "Скучаю по тебе!": {"it": "Mi manchi!", "en": "I miss you!", "es": "¡Te extraño!"}, "Возвращайся скорей!": {"it": "Torna presto!", "en": "Come back soon!", "es": "¡Vuelve pronto!"}, "Жужа": {"it": "Zuzù", "en": "Zhuzha", "es": "Zuzú"}, "Зум": {"it": "Zum", "en": "Zoom", "es": "Zum"}, "Лео": {"it": "Leo", "en": "Leo", "es": "Leo"}, "Ромео": {"it": "Romeo", "en": "Romeo", "es": "Romeo"}, "мама Джулия": {"it": "mamma Giulia", "en": "Mommy Giulia", "es": "mamá Giulia"}, "мама Эрика": {"it": "mamma Erika", "en": "Mommy Erika", "es": "mamá Erika"}, "мама Алисия": {"it": "mamma Alicia", "en": "Mommy Alicia", "es": "mamá Alicia"}, "папа Давид": {"it": "papà David", "en": "Daddy David", "es": "papá David"}, "Гав! Я Луи!": {"it": "Bau! Sono Louie!", "en": "Woof! I’m Louie!", "es": "¡Guau! ¡Soy Louie!"}, "Гав! Я Панико!": {"it": "Bau! Sono Panico!", "en": "Woof! I’m Panico!", "es": "¡Guau! ¡Soy Panico!"}, "Мяу! Я Ленни!": {"it": "Miao! Sono Lenny!", "en": "Meow! I’m Lenny!", "es": "¡Miau! ¡Soy Lenny!"}, "Агу! Я Матильда!": {"it": "Ghu-ghu! Sono Matilda!", "en": "Goo-goo! I’m Matilda!", "es": "¡Agú! ¡Soy Matilda!"}};
+const T=k=>LANG==='ru'?k:((DICT[k]||{})[LANG]||k);
+
+/* ---------- drones ---------- */
+const DR={y:{f:'#ffc93c',s:'#c98200',h:'#fff6c9',n:'Жужа'},b:{f:'#6cc3ff',s:'#1f78c8',h:'#e0f4ff',n:'Зум'}};
+const prop=(x,y,back)=>`<g transform="translate(${x} ${y})"><rect x="-2.5" y="0" width="5" height="9" fill="${ARM}"/><ellipse class="prop" rx="23" ry="4.5" fill="${back?'#c3cedb':'#eef4fb'}" stroke="${ARM}" stroke-width="2.5"/></g>`;
+const eye=(cx,px)=>`<g class="eye"><circle cx="${cx}" cy="-4" r="11" fill="#fff" stroke="${INK}" stroke-width="2.5"/><circle cx="${cx+px}" cy="-3" r="6" fill="${INK}"/><circle cx="${cx+px+2}" cy="-6" r="2.2" fill="#fff"/></g>`;
+const zh=(x,y,s=1,mode='',anim='',c='y')=>{const d=DR[c],sl=mode==='sleep';
+  const eyes=sl?`<path d="M-23 -3 q8 7 17 0 M6 -3 q8 7 17 0" stroke="${INK}" stroke-width="3.5" fill="none" stroke-linecap="round"/>`:eye(-14,2)+eye(14,2);
+  const mouth=sl?`<path d="M-5 14 Q0 18 5 14" stroke="${INK}" stroke-width="3" fill="none" stroke-linecap="round"/>`:`<path d="M-10 11 Q0 22 10 11Z" fill="#c2410c" stroke="${INK}" stroke-width="2.5" stroke-linejoin="round"/>`;
+  return `<g transform="translate(${x} ${y}) scale(${s})"><g class="${anim}"><g class="zh ${mode}" data-tap="${UI().buzz} ${T(d.n)}!" data-snd="drone">
+  <path d="M-18 -18 L-34 -36 M18 -18 L34 -36" stroke="${ARM}" stroke-width="6" stroke-linecap="round"/>${prop(-34,-45,1)}${prop(34,-45,1)}
+  <path d="M-22 22 L-28 38 M22 22 L28 38 M-42 38 H-14 M14 38 H42" stroke="${ARM}" stroke-width="5" stroke-linecap="round" fill="none"/>
+  <line x1="0" y1="-28" x2="0" y2="-42" stroke="${ARM}" stroke-width="3"/><circle class="led" cy="-46" r="6" fill="#ff5a5f" stroke="${INK}" stroke-width="2"/>
+  <ellipse rx="38" ry="30" fill="${d.f}" stroke="${d.s}" stroke-width="3"/><ellipse cx="-14" cy="-17" rx="12" ry="5.5" fill="${d.h}" opacity=".9"/>
+  <circle cx="-27" cy="10" r="5" fill="#ff9aa2"/><circle cx="27" cy="10" r="5" fill="#ff9aa2"/>${eyes}${mouth}
+  <path d="M-30 -6 L-56 -22 M30 -6 L56 -22" stroke="${ARM}" stroke-width="6" stroke-linecap="round"/>${prop(-56,-31)}${prop(56,-31)}</g></g></g>`;};
+
+/* ---------- characters: edit CHAR only ---------- */
+/* hair: straight | curly | long ; bottoms: pants | shorts | skirt */
+const CHAR={
+  leo:{n:'Лео',skin:'#e3ad85',hair:'#24170f',hairStyle:'straight',top:'#2f5fd8',sleeve:'#4a5a8a',bottoms:'pants',leg:'#6b7a4a',shoe:'#2f2f2f'},
+  romeo:{n:'Ромео',skin:'#f6cfae',hair:'#c98f4a',hairStyle:'curly',top:'#efe4cf',sleeve:'#efe4cf',bottoms:'shorts',leg:'#9cc4e8',shoe:'#6fae8f'},
+  mom1:{n:'мама Джулия',skin:'#e8b892',hair:'#1f1612',hairStyle:'long',top:'#2f5a48',sleeve:'#2f5a48',bottoms:'pants',leg:'#4a4a55',shoe:'#3a3a3a',glasses:1},
+  mom2:{n:'мама Эрика',skin:'#f3cfb0',hair:'#8a6440',hairStyle:'long',top:'#2a2a30',sleeve:'#2a2a30',bottoms:'pants',leg:'#5a6b8a',shoe:'#a0643a'},
+  alicia:{n:'мама Алисия',skin:'#c98e64',hair:'#14100e',hairStyle:'long',top:'#e8ddd5',sleeve:'#e8ddd5',bottoms:'pants',leg:'#6b6f8a',shoe:'#3a3a3a'},
+  david:{n:'папа Давид',skin:'#e9b994',hair:'#2a1c14',hairStyle:'straight',top:'#2f3b55',sleeve:'#2f3b55',bottoms:'pants',leg:'#4a4a55',shoe:'#2f2f2f',beard:'#3a2a20'}
+};
+const AE={down:s=>[s*30,-38],up:s=>[s*30,-108],out:s=>[s*42,-52],fwd:s=>[s*9,-48],bar:()=>[41,-45]};
+const dk=(hex,f=.75)=>'#'+[1,3,5].map(i=>Math.round(parseInt(hex.slice(i,i+2),16)*f).toString(16).padStart(2,'0')).join('');
+const kid=(x,y,who,o={})=>{const c=CHAR[who],p=o.pose||'stand',hs=c.hairStyle,b=c.bottoms;
+  const arm=(sd,t)=>{const [ex,ey]=AE[t](sd);return `<path d="M${sd*17} -68 L${ex} ${ey}" stroke="${c.skin}" stroke-width="10" stroke-linecap="round"/><circle cx="${sd*18}" cy="-68" r="8.5" fill="${c.sleeve}"/><circle cx="${ex}" cy="${ey}" r="6" fill="${c.skin}"/>`;};
+  const over=b==='shorts'?`<rect x="-17" y="-40" width="34" height="16" rx="6" fill="${c.leg}"/>`:b==='skirt'?`<path d="M-17 -42 H17 L24 -20 H-24Z" fill="${c.leg}"/>`:'';
+  let legs='';
+  if(p==='stand'||p==='sit'){const bt=p==='sit'?-14:-4,h=bt+34;
+    legs=b==='pants'?`<rect x="-15" y="-38" width="13" height="${h}" rx="5" fill="${c.leg}"/><rect x="2" y="-38" width="13" height="${h}" rx="5" fill="${c.leg}"/>`
+      :`<rect x="-14" y="-30" width="10" height="${h-6}" rx="5" fill="${c.skin}"/><rect x="4" y="-30" width="10" height="${h-6}" rx="5" fill="${c.skin}"/>${over}`;
+    legs+=`<ellipse cx="-9" cy="${bt}" rx="10" ry="5" fill="${c.shoe}"/><ellipse cx="9" cy="${bt}" rx="10" ry="5" fill="${c.shoe}"/>`;}
+  if(p==='ride')legs=`<path d="M-6 -34 L10 -24 L4 -2 M6 -34 L20 -22 L10 0" stroke="${b==='pants'?c.leg:c.skin}" stroke-width="11" fill="none" stroke-linecap="round" stroke-linejoin="round"/>${over}<ellipse cx="6" cy="0" rx="9" ry="4.5" fill="${c.shoe}"/><ellipse cx="12" cy="2" rx="9" ry="4.5" fill="${c.shoe}"/>`;
+  const back=hs==='curly'?`<circle cy="-100" r="27" fill="${c.hair}"/>${[180,202,225,247,270,292,315,337,360].map(a=>`<circle cx="${(29*Math.cos(a*Math.PI/180)).toFixed(1)}" cy="${(-100+29*Math.sin(a*Math.PI/180)).toFixed(1)}" r="9" fill="${c.hair}"/>`).join('')}<circle cx="-25" cy="-84" r="7" fill="${c.hair}"/><circle cx="25" cy="-84" r="7" fill="${c.hair}"/>`
+    :hs==='long'?`<path d="M-27 -100 Q-27 -126 0 -126 Q27 -126 27 -100 L30 -58 Q0 -50 -30 -58Z" fill="${c.hair}"/>`
+    :`<ellipse cy="-100" rx="26" ry="24" fill="${c.hair}"/>`;
+  const fringe=hs==='curly'?[-16,-5,6,16].map((cx,k)=>`<circle cx="${cx}" cy="${-113+(k%2)*3}" r="8.5" fill="${c.hair}"/><path d="M${cx-3} ${-113+(k%2)*3} a3 3 0 1 1 3 3" stroke="${dk(c.hair)}" stroke-width="2" fill="none"/>`).join('')
+    :`<path d="M-23 -99 Q-23 -123 0 -122 Q23 -123 23 -99 L18 -104 L14 -98 L9 -105 L4 -99 L-1 -106 L-6 -99 L-11 -105 L-16 -99Z" fill="${c.hair}"/>`;
+  const eyes=o.laugh?`<path d="M-12 -95 q4 -5 8 0 M4 -95 q4 -5 8 0" stroke="${INK}" stroke-width="3" fill="none" stroke-linecap="round"/>`
+    :o.sad?`<path d="M-12 -96 q4 4 8 0 M4 -96 q4 4 8 0" stroke="${INK}" stroke-width="3" fill="none" stroke-linecap="round"/><ellipse class="tear" cx="-9" cy="-90" rx="3" ry="4.5" fill="#4fb6ff"/><ellipse class="tear b" cx="9" cy="-90" rx="3" ry="4.5" fill="#4fb6ff"/>`
+    :`<circle cx="-8" cy="-95" r="3.8" fill="${INK}"/><circle cx="8" cy="-95" r="3.8" fill="${INK}"/><circle cx="-6.8" cy="-96.5" r="1.3" fill="#fff"/><circle cx="9.2" cy="-96.5" r="1.3" fill="#fff"/>`;
+  const mouth=o.sad?`<path d="M-7 -80 Q0 -86 7 -80" stroke="${INK}" stroke-width="3" fill="none" stroke-linecap="round"/>`:`<path d="M-8 -85 Q0 -75 8 -85Z" fill="#c2410c" stroke="${INK}" stroke-width="1.8" stroke-linejoin="round"/>`;
+  const remote=o.remote?`<g transform="translate(0 -48)"><path d="M8 -8 V-20" stroke="#3a3a4a" stroke-width="2"/><circle cx="8" cy="-21" r="2.4" fill="#ff5a5f"/><rect x="-14" y="-8" width="28" height="16" rx="4" fill="#3a3a4a"/><circle cx="-5" r="3" fill="#ff5a5f"/><circle cx="5" r="3" fill="#5ad16a"/></g>`:'';
+  return `<g transform="translate(${x} ${y}) scale(${o.s||1})"><g class="${o.anim||''}" style="${o.st||''}"><g class="tk" data-tap="${UI().hi} ${T(c.n)}!" data-snd="kid">
+  ${back}${legs}<rect x="-22" y="-76" width="44" height="44" rx="15" fill="${c.top}"/>${arm(-1,o.l||'down')}${arm(1,o.r||'down')}
+  <circle cy="-94" r="23" fill="${c.skin}"/>${fringe}
+  <circle cx="-14" cy="-86" r="4.5" fill="#ff9aa2" opacity=".8"/><circle cx="14" cy="-86" r="4.5" fill="#ff9aa2" opacity=".8"/>${c.beard?`<path d="M-20 -92 Q-19 -70 0 -70 Q19 -70 20 -92 Q12 -80 0 -80 Q-12 -80 -20 -92Z" fill="${c.beard}" opacity=".55"/>`:''}${eyes}${c.glasses?`<g fill="none" stroke="#1a1410" stroke-width="3"><circle cx="-9" cy="-95" r="8"/><circle cx="9" cy="-95" r="8"/><path d="M-1 -96 h2 M-17 -96 h-5 M17 -96 h5"/></g>`:''}${mouth}${remote}</g></g></g>`;};
+
+/* ---------- props & scenery ---------- */
+const bike=(x,y,col,who,anim='')=>{const w=cx=>`<g transform="translate(${cx} -18)"><circle r="18" fill="none" stroke="${INK}" stroke-width="5"/><g class="wheel"><path d="M-15 0 H15 M0 -15 V15 M-10.6 -10.6 L10.6 10.6 M-10.6 10.6 L10.6 -10.6" stroke="#9aa0aa" stroke-width="2"/></g><circle r="3" fill="${INK}"/></g>`;
+  return `<g transform="translate(${x} ${y})"><g class="${anim}">${w(-30)}${w(30)}
+  <path d="M-30 -18 L-6 -20 L21 -52 M-6 -20 L-12 -48 M-30 -18 L-12 -48 L18 -46 M30 -18 L21 -57" stroke="${col}" stroke-width="6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  <ellipse cx="-12" cy="-50" rx="12" ry="4.5" fill="${INK}"/>
+  ${kid(-12,-23,who,{pose:'ride',l:'bar',r:'bar',s:.8})}
+  <path d="M14 -60 L28 -57" stroke="${INK}" stroke-width="5" stroke-linecap="round"/></g></g>`;};
+const sky=(id,a,b)=>`<defs><linearGradient id="${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${a}"/><stop offset="1" stop-color="${b}"/></linearGradient></defs><rect width="400" height="300" fill="url(#${id})"/>`;
+const sun=(x,y)=>`<g transform="translate(${x} ${y})"><g class="rays">${[0,45,90,135,180,225,270,315].map(a=>`<rect x="-3" y="-46" width="6" height="12" rx="3" fill="#ffb700" transform="rotate(${a})"/>`).join('')}</g><circle r="26" fill="#ffd23f"/><circle cx="-8" cy="-2" r="3" fill="#c98200"/><circle cx="8" cy="-2" r="3" fill="#c98200"/><path d="M-8 8 Q0 14 8 8" stroke="#c98200" stroke-width="2.5" fill="none" stroke-linecap="round"/></g>`;
+const cloud=(x,y,s,b)=>`<g class="drift ${b?'b':''}"><g transform="translate(${x} ${y}) scale(${s})" fill="#fff"><circle cx="-22" cy="4" r="16"/><circle cx="0" cy="-6" r="22"/><circle cx="24" cy="4" r="16"/><rect x="-38" y="4" width="78" height="16" rx="8"/></g></g>`;
+const ground=()=>`<path d="M0 232 Q90 205 190 228 T400 222 V300 H0Z" fill="#9bdc7c"/><path d="M0 252 Q110 238 220 254 T400 248 V300 H0Z" fill="#6cc25a"/>${[[40,270],[170,284],[330,276],[250,292]].map(([x,y])=>`<g transform="translate(${x} ${y})"><circle r="5" fill="#fff"/><circle r="2.2" fill="#ffc93c"/></g>`).join('')}`;
+const palm=(x,y,s=1)=>`<g transform="translate(${x} ${y}) scale(${s})"><path d="M0 0 Q-8 -60 6 -120" stroke="#9a6a3a" stroke-width="12" fill="none" stroke-linecap="round"/>${[-200,-150,-110,-70,-30,20].map(a=>`<path d="M6 -120 q30 -12 58 12 q-30 -2 -58 -12Z" fill="#3f9c46" transform="rotate(${a} 6 -120)"/>`).join('')}<circle cx="6" cy="-118" r="6" fill="#7a4a2a"/></g>`;
+const bubble=(x0,y,t,w0,d=0,tx0=0)=>{const w=Math.max(60,Math.round(t.length*9.2+30)),x=Math.min(Math.max(x0,w/2+6),394-w/2),tx=Math.max(-w/2+16,Math.min(w/2-16,tx0+x0-x));return `<g class="pop" style="animation-delay:${d}s"><g transform="translate(${x} ${y})"><path d="M${tx-8} 18 L${tx} 32 L${tx+8} 18" fill="#fff" stroke="${INK}" stroke-width="2.5" stroke-linejoin="round"/><rect x="${-w/2}" y="-20" width="${w}" height="40" rx="20" fill="#fff" stroke="${INK}" stroke-width="2.5"/><rect x="${tx-9}" y="14" width="18" height="6" fill="#fff"/><text y="6" text-anchor="middle" font-size="17" font-weight="800" fill="${INK}">${t}</text></g></g>`};
+const bushes=()=>{const one=o=>[20,120,220,320].map(x=>`<g transform="translate(${x+o} 240)"><circle cx="-14" r="16" fill="#4caf50"/><circle cx="8" cy="-8" r="20" fill="#3f9c46"/><circle cx="26" r="13" fill="#4caf50"/></g>`).join('');return `<g class="scroll">${one(0)}${one(400)}</g>`;};
+const road=()=>`<rect y="244" width="400" height="40" fill="#8f969e"/><path class="dash" d="M-40 264 H440" stroke="#fff" stroke-width="4" stroke-dasharray="20 16"/><rect y="284" width="400" height="16" fill="#6cc25a"/>`;
+const pool=(id)=>`${sky(id,'#7fcbff','#d9f2ff')}${sun(345,50)}${cloud(90,45,.7)}${palm(30,160,.9)}${palm(385,165,.8)}
+  <rect y="150" width="400" height="150" fill="#f2e3c6"/>${[0,1,2,3,4,5,6,7,8].map(k=>`<path d="M${k*50} 150 V300" stroke="#e2cfab" stroke-width="2"/>`).join('')}
+  <rect x="30" y="168" width="340" height="122" rx="16" fill="#45bdf0" stroke="#fff" stroke-width="8"/><rect x="34" y="172" width="332" height="14" fill="#2f9fd0"/>
+  <defs><clipPath id="${id}c"><rect x="34" y="172" width="332" height="114" rx="12"/></clipPath></defs>`;
+const water=(id)=>{let d='M0 206';for(let x=0;x<440;x+=30)d+=` q7.5 -6 15 0 t15 0`;
+  return `<g clip-path="url(#${id}c)"><g class="wave"><path d="${d} V290 H0Z" fill="#45bdf0" opacity=".88"/><path d="${d}" stroke="#bfeaff" stroke-width="3" fill="none"/></g></g>`;};
+const drops=(kx)=>[[-26,-46,0],[22,-52,.3],[-8,-60,.6],[34,-34,.9],[-36,-30,.45]].map(([dx,dy,d])=>`<circle class="drop" cx="${kx+dx/3}" cy="204" r="4" fill="#bfeaff" stroke="#2f9fd0" stroke-width="1" style="--dx:${dx}px;--dy:${dy}px;animation-delay:${d}s"/>`).join('');
+const duck=(x,y)=>`<g transform="translate(${x} ${y})"><g class="float"><ellipse cy="-6" rx="17" ry="10" fill="#ffd23f" stroke="#c98200" stroke-width="2"/><circle cx="9" cy="-20" r="9" fill="#ffd23f" stroke="#c98200" stroke-width="2"/><path d="M16 -20 L25 -18 L16 -15Z" fill="#ff8a00"/><circle cx="11" cy="-22" r="1.8" fill="${INK}"/></g></g>`;
+const ring=(x,y)=>`<ellipse cx="${x}" cy="${y}" rx="34" ry="9" fill="none" stroke="#ff6f91" stroke-width="11"/><ellipse cx="${x}" cy="${y}" rx="34" ry="9" fill="none" stroke="#fff" stroke-width="11" stroke-dasharray="14 18"/>`;
+const orbit=(c,d)=>`<g transform="translate(200 92)"><g class="orbit" style="animation-delay:${d}s"><g transform="translate(62 0)"><g class="orbitR" style="animation-delay:${d}s">${zh(0,0,.5,'','',c)}</g></g></g></g>`;
+
+/* ---------- extra characters & props for this book ---------- */
+const dog=(x,y,s=1,anim='')=>`<g transform="translate(${x} ${y}) scale(${s})"><g class="${anim}"><g class="tk" data-tap="${T('Гав! Я Панико!')}" data-snd="dog">
+<path class="dtail" d="M-38 -48 Q-60 -60 -56 -84" stroke="#1d1d22" stroke-width="10" fill="none" stroke-linecap="round"/>
+<rect x="-34" y="-32" width="13" height="32" rx="6" fill="#1d1d22"/><rect x="-18" y="-32" width="13" height="32" rx="6" fill="#26262c"/><rect x="8" y="-32" width="13" height="32" rx="6" fill="#1d1d22"/><rect x="23" y="-32" width="13" height="32" rx="6" fill="#26262c"/>
+<ellipse cx="-27" cy="-1" rx="9" ry="4" fill="#3a3a44"/><ellipse cx="30" cy="-1" rx="9" ry="4" fill="#3a3a44"/>
+<ellipse cx="-2" cy="-44" rx="42" ry="24" fill="#26262c"/>
+<path d="M28 -46 Q34 -32 30 -22" stroke="#fff" stroke-width="7" fill="none" stroke-linecap="round"/><path d="M22 -50 Q32 -42 44 -48" stroke="#e8433f" stroke-width="6" fill="none" stroke-linecap="round"/><circle cx="34" cy="-42" r="4" fill="#ffc93c"/>
+<circle cx="34" cy="-68" r="22" fill="#26262c"/>
+<ellipse cx="50" cy="-60" rx="15" ry="10" fill="#5c5c66"/><ellipse cx="62" cy="-63" rx="5.5" ry="4.5" fill="#000"/>
+<ellipse class="pant" cx="50" cy="-48" rx="5" ry="7" fill="#ff7aa2"/>
+<path d="M22 -84 Q8 -82 10 -54 Q22 -60 28 -76Z" fill="#111"/>
+<circle cx="40" cy="-73" r="5" fill="#e0902e"/><circle cx="41" cy="-73" r="2.4" fill="#111"/><circle cx="42" cy="-74.5" r="1" fill="#fff"/>
+</g></g></g>`;
+const louie=(x,y,s=1,anim='')=>`<g transform="translate(${x} ${y}) scale(${s})"><g class="${anim}"><g class="tk" data-tap="${T('Гав! Я Луи!')}" data-snd="dog">
+<path class="dtail" d="M-38 -48 Q-56 -62 -50 -80" stroke="#a8652a" stroke-width="7" fill="none" stroke-linecap="round"/>
+<rect x="-32" y="-30" width="10" height="30" rx="5" fill="#a8652a"/><rect x="-18" y="-30" width="10" height="30" rx="5" fill="#bf7a33"/><rect x="10" y="-30" width="10" height="30" rx="5" fill="#a8652a"/><rect x="24" y="-30" width="10" height="30" rx="5" fill="#bf7a33"/>
+<ellipse cx="-27" cy="-1" rx="7" ry="3.5" fill="#8a4f1c"/><ellipse cx="29" cy="-1" rx="7" ry="3.5" fill="#8a4f1c"/>
+<ellipse cx="-2" cy="-42" rx="40" ry="19" fill="#bf7a33"/><ellipse cx="26" cy="-38" rx="8" ry="10" fill="#fff"/>
+<path d="M20 -76 L4 -106 L32 -86Z" fill="#7a4418"/><path d="M42 -84 L56 -110 L58 -78Z" fill="#7a4418"/>
+<circle cx="34" cy="-66" r="20" fill="#bf7a33"/><ellipse cx="50" cy="-58" rx="13" ry="9" fill="#6b3e1e"/><ellipse cx="61" cy="-61" rx="5" ry="4" fill="#000"/>
+<ellipse class="pant" cx="49" cy="-47" rx="4" ry="6" fill="#ff7aa2"/>
+<circle cx="39" cy="-71" r="5.5" fill="#fff"/><circle cx="40" cy="-71" r="3.6" fill="#3a2210"/><circle cx="41" cy="-72.5" r="1.1" fill="#fff"/>
+</g></g></g>`;
+const lenny=(x,y,s=1)=>`<g transform="translate(${x} ${y}) scale(${s})"><g class="tk" data-tap="${T('Мяу! Я Ленни!')}" data-snd="cat">
+<path class="tail" d="M18 -6 Q46 -10 40 -36 Q37 -50 29 -46" stroke="#3b3b44" stroke-width="8" fill="none" stroke-linecap="round"/>
+<ellipse cy="-24" rx="22" ry="24" fill="#3b3b44"/><path d="M-8 -36 q8 4 16 0 M-10 -26 q10 4 20 0" stroke="#2c2c33" stroke-width="2.5" fill="none"/>
+<path d="M-18 -62 L-15 -88 L-2 -72Z M18 -62 L15 -88 L2 -72Z" fill="#3b3b44"/><path d="M-14 -67 L-13 -80 L-6 -72Z M14 -67 L13 -80 L6 -72Z" fill="#6b5a5a"/>
+<circle cy="-56" r="20" fill="#3b3b44"/><path d="M-5 -74 v6 M0 -75 v7 M5 -74 v6" stroke="#2c2c33" stroke-width="2.5" stroke-linecap="round"/>
+<ellipse cx="-7" cy="-58" rx="5" ry="5.5" fill="#c4dc6e"/><ellipse cx="-7" cy="-58" rx="1.5" ry="4.5" fill="#111"/><ellipse cx="7" cy="-58" rx="5" ry="5.5" fill="#c4dc6e"/><ellipse cx="7" cy="-58" rx="1.5" ry="4.5" fill="#111"/>
+<path d="M-3 -50 h6 l-3 3z" fill="#c98a7a"/><ellipse cy="-43" rx="5" ry="3" fill="#c99a6a" opacity=".8"/>
+<path d="M-8 -49 H-26 M-8 -46 L-24 -41 M8 -49 H26 M8 -46 L24 -41" stroke="#9a9aa4" stroke-width="1.3" stroke-linecap="round"/>
+<ellipse cx="-10" cy="-2" rx="8" ry="5" fill="#4a4a52"/><ellipse cx="10" cy="-2" rx="8" ry="5" fill="#4a4a52"/></g></g>`;
+const baby=(x,y,s=1)=>`<g transform="translate(${x} ${y}) scale(${s})"><g class="tk" data-tap="${T('Агу! Я Матильда!')}" data-snd="kid"><ellipse cy="8" rx="15" ry="18" fill="#ffb3c7" stroke="#e88aa6" stroke-width="2"/><circle cy="-10" r="11" fill="#f6d3b6"/><path d="M-3 -20 q4 -6 7 0" stroke="#c98f4a" stroke-width="2.2" fill="none"/><path d="M-6 -10 q2 -2.5 4 0 M2 -10 q2 -2.5 4 0" stroke="${INK}" stroke-width="1.6" fill="none" stroke-linecap="round"/><circle cx="-6" cy="-5" r="2" fill="#ff9aa2"/><circle cx="6" cy="-5" r="2" fill="#ff9aa2"/><path d="M-2 -4 q2 2 4 0" stroke="${INK}" stroke-width="1.4" fill="none"/></g></g>`;
+const suitcase=(x,y)=>`<g transform="translate(${x} ${y})"><path d="M-8 -44 V-52 H8 V-44" stroke="${INK}" stroke-width="3" fill="none"/><rect x="-20" y="-44" width="40" height="40" rx="6" fill="#ffc93c" stroke="${INK}" stroke-width="2.5"/><path d="M-20 -24 H20" stroke="#e8433f" stroke-width="4"/><circle cx="-12" cy="-2" r="3" fill="${INK}"/><circle cx="12" cy="-2" r="3" fill="${INK}"/></g>`;
+const plane=(x,y,s=1,anim='',dir=1)=>`<g transform="translate(${x} ${y})"><g class="${anim}"><g transform="scale(${s*dir} ${s})">
+<path d="M-40 -2 L-52 -24 L-40 -24 L-26 -6Z" fill="#e8433f" stroke="${INK}" stroke-width="2"/><ellipse rx="46" ry="12" fill="#fff" stroke="${INK}" stroke-width="2.5"/>
+<path d="M-6 2 L-24 22 L-12 22 L12 4Z" fill="#cfd8e3" stroke="${INK}" stroke-width="2"/>${[-20,-8,4,16].map(px=>`<circle cx="${px}" cy="-3" r="3" fill="#6cc3ff"/>`).join('')}<path d="M34 -8 Q44 -4 44 0" stroke="${INK}" stroke-width="2" fill="none"/></g></g></g>`;
+const heart=(x,y,s=1)=>`<g transform="translate(${x} ${y}) scale(${s})"><g class="beat"><path d="M0 18 C-30 -4 -22 -30 0 -16 C22 -30 30 -4 0 18Z" fill="#ff5a7a" stroke="#c2185b" stroke-width="2.5"/><ellipse cx="-9" cy="-12" rx="5" ry="3" fill="#fff" opacity=".6"/></g></g>`;
+const bench=(x,w=200)=>`<rect x="${x+18}" y="215" width="10" height="56" rx="4" fill="#e0b000"/><rect x="${x+w-28}" y="215" width="10" height="56" rx="4" fill="#e0b000"/><rect x="${x}" y="203" width="${w}" height="17" rx="8" fill="#ffcc2e" stroke="#d9a400" stroke-width="2.5"/>`;
+const thought=(x,y,inner)=>`<g class="pop" style="animation-delay:.6s"><circle cx="${x-58}" cy="${y+46}" r="5" fill="#fff" stroke="${INK}" stroke-width="2"/><circle cx="${x-44}" cy="${y+34}" r="8" fill="#fff" stroke="${INK}" stroke-width="2"/>
+<g fill="#fff" stroke="${INK}" stroke-width="2.5"><ellipse cx="${x}" cy="${y}" rx="52" ry="40"/></g>${[[-34,-22,20],[0,-34,24],[34,-22,20],[40,10,18],[-40,10,18]].map(([dx,dy,r])=>`<circle cx="${x+dx}" cy="${y+dy}" r="${r}" fill="#fff" stroke="${INK}" stroke-width="2.5"/>`).join('')}<ellipse cx="${x}" cy="${y}" rx="50" ry="38" fill="#fff"/>${inner}</g>`;
+const soccer=(r=10)=>`<circle r="${r}" fill="#fff" stroke="${INK}" stroke-width="2"/><path d="M0 -4 L4 -1 L2.5 4 L-2.5 4 L-4 -1Z" fill="${INK}"/><path d="M0 -4 V-${r} M4 -1 L${r*.9} -${r*.35} M2.5 4 L${r*.55} ${r*.8} M-2.5 4 L-${r*.55} ${r*.8} M-4 -1 L-${r*.9} -${r*.35}" stroke="${INK}" stroke-width="1.3"/>`;
+const swingSet=(kidSvg)=>`<path d="M96 92 L70 262 M96 92 L122 262 M236 92 L210 262 M236 92 L262 262" stroke="#e8433f" stroke-width="7" stroke-linecap="round"/><path d="M90 92 H242" stroke="#e8433f" stroke-width="9" stroke-linecap="round"/>
+<g transform="translate(166 94)"><g class="swing"><path d="M-20 0 V118 M20 0 V118" stroke="${ARM}" stroke-width="3"/><rect x="-26" y="114" width="52" height="8" rx="4" fill="#3d7be0"/>${kidSvg}</g></g>`;
+const slide=()=>`<path d="M300 262 V150 M330 262 V150" stroke="#3d7be0" stroke-width="6"/>${[170,195,220,245].map(y=>`<path d="M300 ${y} H330" stroke="#3d7be0" stroke-width="4"/>`).join('')}<path d="M326 150 Q350 150 362 200 Q372 252 396 258" stroke="#ffc93c" stroke-width="16" fill="none" stroke-linecap="round"/><path d="M296 150 H334" stroke="#3d7be0" stroke-width="8" stroke-linecap="round"/>`;
+const sea=()=>`<rect y="160" width="400" height="90" fill="#4fb6e8"/>${[178,196,214].map((y,k)=>`<g class="wave" style="animation-delay:${k*.4}s"><path d="M-20 ${y} ${Array.from({length:16},()=>'q8 -5 16 0 t16 0').join(' ')}" stroke="#bfeaff" stroke-width="2.5" fill="none"/></g>`).join('')}`;
+const seaFront=()=>{let d='M-20 212';for(let k=0;k<15;k++)d+=' q8 -6 16 0 t16 0';return `<g class="wave"><path d="${d} V250 H-20Z" fill="#4fb6e8" opacity=".9"/><path d="${d}" stroke="#e6f7ff" stroke-width="3" fill="none"/></g>`;};
+const sand=()=>`<path d="M0 238 Q100 226 200 236 T400 234 V300 H0Z" fill="#f6dca8"/>${[[60,270],[150,285],[260,276],[350,290]].map(([x,y])=>`<circle cx="${x}" cy="${y}" r="3" fill="#e8c27e"/>`).join('')}`;
+const field=()=>`<rect y="150" width="400" height="150" fill="#5cbf55"/>${[0,1,2,3].map(k=>`<rect x="${k*100}" y="150" width="50" height="150" fill="#68c960"/>`).join('')}<path d="M200 150 V300 M0 268 H400" stroke="#fff" stroke-width="3" opacity=".9"/><ellipse cx="200" cy="225" rx="44" ry="18" fill="none" stroke="#fff" stroke-width="3" opacity=".9"/>
+<g><path d="M340 262 V178 H392 V262" stroke="#fff" stroke-width="6" fill="none"/>${[192,206,220,234,248].map(y=>`<path d="M340 ${y} H392" stroke="#fff" stroke-width="1" opacity=".7"/>`).join('')}${[352,366,380].map(x=>`<path d="M${x} 178 V262" stroke="#fff" stroke-width="1" opacity=".7"/>`).join('')}</g>`;
+const cypress=(x,y,s=1)=>`<g transform="translate(${x} ${y}) scale(${s})"><rect x="-2" y="-6" width="4" height="8" fill="#7a4a2a"/><path d="M0 -60 Q10 -30 7 -6 H-7 Q-10 -30 0 -60Z" fill="#2f7a3e"/></g>`;
+const italyHills=()=>{const one=o=>`<path d="M${o} 200 Q${o+60} 150 ${o+120} 190 T${o+240} 180 T${o+400} 196 V240 H${o}Z" fill="#9bd37a"/>${[40,90,170,230,300,350].map(x=>cypress(x+o,198+(x%3)*4,.8)).join('')}<g transform="translate(${o+260} 172)"><rect x="-14" y="-18" width="28" height="18" fill="#ffd8a8" stroke="${INK}" stroke-width="1.5"/><path d="M-18 -18 L0 -30 L18 -18Z" fill="#e0703a" stroke="${INK}" stroke-width="1.5"/></g>`;return `<g class="scroll">${one(0)}${one(400)}</g>`;};
+const phone=(x,y,inner,id)=>`<g transform="translate(${x} ${y})"><rect x="-68" y="-118" width="136" height="236" rx="22" fill="#2b2340"/><defs><clipPath id="${id}"><rect x="-60" y="-104" width="120" height="196" rx="12"/></clipPath></defs><g clip-path="url(#${id})"><g transform="translate(${-x} ${-y})">${inner}</g></g>
+<rect x="-18" y="-112" width="36" height="5" rx="2.5" fill="#4a4060"/><g class="beat"><circle cx="-24" cy="100" r="10" fill="#5ad16a"/><path d="M-29 100 q5 -6 10 0" stroke="#fff" stroke-width="2.5" fill="none"/></g><circle cx="24" cy="100" r="10" fill="#e8433f"/></g>`;
+const trainCar=(id)=>{const win=(cx,inner,k)=>`<defs><clipPath id="${id}${k}"><rect x="${cx-40}" y="140" width="80" height="68" rx="10"/></clipPath></defs><rect x="${cx-40}" y="140" width="80" height="68" rx="10" fill="#d9f2ff"/><g clip-path="url(#${id}${k})">${inner}</g><rect x="${cx-40}" y="140" width="80" height="68" rx="10" fill="none" stroke="${INK}" stroke-width="2.5"/>`;
+  return `<g class="ride"><rect x="30" y="118" width="340" height="128" rx="18" fill="#fff" stroke="${INK}" stroke-width="3"/><rect x="30" y="218" width="340" height="12" fill="#2f9e5a"/><rect x="30" y="230" width="340" height="10" fill="#e8433f"/>
+  ${win(100,kid(100,235,'mom1',{s:.62,l:'fwd',r:'fwd'})+baby(100,200,.6),'a')}${win(200,kid(200,240,'romeo',{s:.66,l:'up',laugh:1}),'b')}${win(300,dog(282,224,.72),'c')}
+  ${[80,140,260,320].map(cx=>`<g transform="translate(${cx} 252)"><circle r="12" fill="#3a3a4a"/><g class="wheel"><path d="M-9 0 H9 M0 -9 V9" stroke="#aaa" stroke-width="2"/></g></g>`).join('')}</g>`;};
+
+
+/* ---------- Zhuzha book props ---------- */
+const ball=(x,y,c='')=>`<g transform="translate(${x} ${y})"><g class="${c}"><circle r="14" fill="#ff4d4d" stroke="#a3201d" stroke-width="2.5"/><path d="M-13 -2 Q0 8 13 -2" stroke="#fff" stroke-width="3" fill="none"/><ellipse cx="-5" cy="-7" rx="4" ry="2.5" fill="#fff" opacity=".8"/></g></g>`;
+const tree=(x,y,withBall)=>`<g transform="translate(${x} ${y})"><rect x="-14" y="-115" width="28" height="115" rx="8" fill="#9a5f35"/><path d="M0 -80 L-26 -104 M4 -70 L26 -92" stroke="#9a5f35" stroke-width="9" stroke-linecap="round"/>
+<circle cx="-46" cy="-128" r="40" fill="#3f9c46"/><circle cx="46" cy="-128" r="40" fill="#3f9c46"/><circle cy="-152" r="60" fill="#4caf50"/><circle cx="-18" cy="-170" r="22" fill="#66c46a"/><circle cx="26" cy="-140" r="14" fill="#66c46a"/></g>${withBall?ball(x+35,y-165,'wobble'):''}`;
+const bird=(x,y,laugh)=>`<g transform="translate(${x} ${y})"><g class="${laugh?'hop':''}"><path d="M-17 0 L-34 -8 L-30 8Z" fill="#8a5a32"/><ellipse cy="4" rx="20" ry="15" fill="#b9773f"/><ellipse cx="4" cy="9" rx="12" ry="8" fill="#f3dcb4"/><circle cx="14" cy="-10" r="12" fill="#b9773f"/>
+${laugh?`<path d="M16 -14 q4 -4 8 0" stroke="${INK}" stroke-width="2.5" fill="none" stroke-linecap="round"/><path d="M25 -10 L36 -12 L27 -6Z M25 -5 L35 -2 L26 -2Z" fill="#ffb100"/>`
+:`<circle cx="19" cy="-12" r="3" fill="${INK}"/><circle cx="20" cy="-13" r="1" fill="#fff"/><path d="M25 -9 L35 -6 L25 -3Z" fill="#ffb100"/>`}
+<ellipse class="wing" cx="-4" cy="2" rx="13" ry="7" fill="#8a5a32"/><path d="M-4 18 v7 M4 18 v7" stroke="#e08a00" stroke-width="2.5" stroke-linecap="round"/></g></g>`;
+const branch=()=>`<path d="M410 172 Q330 184 236 200" stroke="#8a5a32" stroke-width="12" fill="none" stroke-linecap="round"/>${[[360,170,-20],[300,186,20],[262,190,-30],[390,160,30]].map(([x,y,r])=>`<ellipse cx="${x}" cy="${y}" rx="14" ry="7" fill="#4caf50" transform="rotate(${r} ${x} ${y})"/>`).join('')}`;
+const cat=(x,y)=>`<g transform="translate(${x} ${y})"><path class="tail" d="M18 -6 Q46 -10 40 -36 Q37 -50 29 -46" stroke="#ff9f43" stroke-width="8" fill="none" stroke-linecap="round"/>
+<ellipse cy="-24" rx="22" ry="24" fill="#ff9f43"/><ellipse cy="-18" rx="12" ry="15" fill="#ffe0bd"/>
+<g class="paw"><path d="M12 -34 Q28 -48 36 -60" stroke="#ff9f43" stroke-width="9" fill="none" stroke-linecap="round"/><circle cx="37" cy="-62" r="6" fill="#ffe0bd"/></g>
+<path d="M-18 -62 L-15 -86 L-3 -73Z M18 -62 L15 -86 L3 -73Z" fill="#ff9f43"/><path d="M-14 -66 L-13 -79 L-7 -72Z M14 -66 L13 -79 L7 -72Z" fill="#ff9aa2"/>
+<circle cy="-56" r="19" fill="#ff9f43"/><path d="M-5 -74 v7 M0 -75 v8 M5 -74 v7" stroke="#e07b1a" stroke-width="2.5" stroke-linecap="round"/>
+<ellipse cx="-6" cy="-59" rx="3.5" ry="5" fill="${INK}"/><ellipse cx="9" cy="-59" rx="3.5" ry="5" fill="${INK}"/>
+<path d="M-1 -51 h6 l-3 3z" fill="#ff6f91"/><path d="M-2 -46 q4 3 8 0" stroke="${INK}" stroke-width="2" fill="none" stroke-linecap="round"/>
+<path d="M-8 -50 H-26 M-8 -47 L-24 -42 M14 -50 H30 M14 -47 L28 -42" stroke="${INK}" stroke-width="1.5" stroke-linecap="round"/>
+<ellipse cx="-10" cy="-2" rx="8" ry="5" fill="#ffe0bd"/><ellipse cx="10" cy="-2" rx="8" ry="5" fill="#ffe0bd"/></g>`;
+const boy=(x,y,happy)=>`<g transform="translate(${x} ${y})"><g class="${happy?'jump':''}">
+<rect x="-15" y="-36" width="12" height="32" rx="5" fill="#2f4a8a"/><rect x="3" y="-36" width="12" height="32" rx="5" fill="#2f4a8a"/>
+<ellipse cx="-10" cy="-3" rx="11" ry="5" fill="#3a3a3a"/><ellipse cx="10" cy="-3" rx="11" ry="5" fill="#3a3a3a"/>
+${happy?`<path d="M-17 -66 L-28 -102 M17 -66 L28 -102" stroke="#f6c9a0" stroke-width="10" stroke-linecap="round"/>`
+:`<path d="M-19 -64 L-30 -40 M19 -64 L30 -40" stroke="#f6c9a0" stroke-width="10" stroke-linecap="round"/>`}
+<rect x="-23" y="-76" width="46" height="46" rx="15" fill="#3d7be0"/><path d="M-8 -60 h16" stroke="#fff" stroke-width="4" stroke-linecap="round"/>
+<circle cy="-96" r="23" fill="#f6c9a0"/><path d="M-23 -100 Q-22 -126 0 -122 Q22 -126 23 -100 Q12 -111 0 -109 Q-12 -113 -23 -100Z" fill="#6b3e1e"/>
+<circle cx="-14" cy="-86" r="4.5" fill="#ff9aa2"/><circle cx="14" cy="-86" r="4.5" fill="#ff9aa2"/>
+${happy?`<path d="M-13 -96 q5 -6 10 0 M3 -96 q5 -6 10 0" stroke="${INK}" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M-9 -86 Q0 -74 9 -86Z" fill="#c2410c" stroke="${INK}" stroke-width="2" stroke-linejoin="round"/>${ball(0,-118,'fall')}`
+:`<path d="M-13 -96 q5 4 10 0 M3 -96 q5 4 10 0" stroke="${INK}" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M-7 -80 Q0 -86 7 -80" stroke="${INK}" stroke-width="3" fill="none" stroke-linecap="round"/><ellipse class="tear" cx="-9" cy="-90" rx="3" ry="4.5" fill="#4fb6ff"/><ellipse class="tear b" cx="9" cy="-90" rx="3" ry="4.5" fill="#4fb6ff"/>`}
+</g></g>`;
+const room=(night)=>{const w=night?'#3b3f7a':'#ffe2a8',d=night?'#454a8c':'#ffd47e';
+  let dots='';for(let r=0;r<4;r++)for(let c=0;c<9;c++)dots+=`<circle cx="${20+c*46+(r%2)*23}" cy="${22+r*58}" r="4" fill="${d}"/>`;
+  return `<rect width="400" height="300" fill="${w}"/>${dots}<rect y="245" width="400" height="55" fill="${night?'#5b4170':'#e0a36a'}"/><path d="M0 245 H400" stroke="${night?'#463058':'#c4844e'}" stroke-width="4"/>
+  <ellipse cx="160" cy="275" rx="90" ry="14" fill="${night?'#7a4f8e':'#ff9aa2'}" opacity=".8"/>
+  <rect x="40" y="40" width="124" height="104" rx="10" fill="${night?'#1b1f4b':'#9ad8ff'}" stroke="#fff" stroke-width="8"/>
+  ${night?`<path d="M128 64 a18 18 0 1 0 14 30 a14 14 0 1 1 -14 -30Z" fill="#ffe9a0"/>${[[66,66],[92,106],[146,118],[70,124]].map(([x,y],k)=>`<circle class="tw" style="animation-delay:${k*.5}s" cx="${x}" cy="${y}" r="3" fill="#fff"/>`).join('')}`
+  :`<circle cx="124" cy="78" r="18" fill="#ffd23f"/><g fill="#fff"><circle cx="70" cy="116" r="10"/><circle cx="84" cy="110" r="13"/><circle cx="98" cy="118" r="9"/></g>`}
+  <path d="M102 44 V140 M44 92 H160" stroke="#fff" stroke-width="6"/>
+  <path d="M30 34 Q46 90 34 152 H22 V34Z M174 34 Q158 90 170 152 H182 V34Z" fill="${night?'#8a5fa8':'#ff8c69'}"/>
+  <rect x="222" y="205" width="150" height="12" rx="4" fill="#a0643a"/><path d="M238 217 v16 h14 M356 217 v16 h-14" stroke="#a0643a" stroke-width="5" fill="none"/>
+  <rect x="340" y="186" width="20" height="19" rx="3" fill="#3d7be0"/><text x="350" y="201" text-anchor="middle" font-size="14" font-weight="900" fill="#fff">★</text>
+  <rect x="232" y="190" width="18" height="15" rx="3" fill="#e8433f"/>`;};
+
+
+
+const BOOKS={
+zhuzha:[
+{s:()=>sky('a','#7fcbff','#d9f2ff')+sun(330,60)+cloud(70,60,1)+cloud(250,40,.7,1)+ground()+zh(200,150,1.45),
+ t:{ru:"<h1>Дрончик Жужа</h1><p class=\"sub\">Сказка для самых маленьких</p><span class=\"hint\">Нажми на Жужу!</span>",it:"<h1>Il dronetto Zuzù</h1><p class=\"sub\">Una storia per i più piccoli</p><span class=\"hint\">Tocca Zuzù!</span>",en:"<h1>Zhuzha the Little Drone</h1><p class=\"sub\">A story for little ones</p><span class=\"hint\">Tap Zhuzha!</span>",es:"<h1>Zuzú, el pequeño dron</h1><p class=\"sub\">Un cuento para los más pequeños</p><span class=\"hint\">¡Toca a Zuzú!</span>"}},
+{s:()=>room()+zh(297,166,.85),
+ t:{ru:"<p>Жил-был маленький дрон. Звали его Жужа, потому что он всегда жужжал: <span class=\"say\">«Жжжж! Жжжж!»</span></p><p>У Жужи было четыре пропеллера, два светящихся глазика и большое желание всё-всё увидеть.</p>",it:"<p>C’era una volta un piccolo drone. Si chiamava Zuzù, perché ronzava sempre: <span class=\"say\">«Bzzz! Bzzz!»</span></p><p>Zuzù aveva quattro eliche, due occhietti luminosi e tanta voglia di vedere tutto tutto.</p>",en:"<p>Once upon a time there was a little drone. His name was Zhuzha, because he always buzzed: <span class=\"say\">“Bzzz! Bzzz!”</span></p><p>Zhuzha had four propellers, two shiny little eyes and a big wish to see everything.</p>",es:"<p>Había una vez un pequeño dron. Se llamaba Zuzú, porque siempre zumbaba: <span class=\"say\">«¡Bzzz! ¡Bzzz!»</span></p><p>Zuzú tenía cuatro hélices, dos ojitos brillantes y muchas ganas de verlo todo.</p>"}},
+{s:()=>sky('b','#8fd3ff','#e3f6ff')+sun(60,52)+cloud(220,50,.8)+cloud(340,90,.6,1)+ground()+
+   `<g transform="translate(40 250)"><rect x="0" y="-60" width="90" height="60" fill="#fff3d6" stroke="${INK}" stroke-width="2.5"/><path d="M-10 -58 L45 -100 L100 -58Z" fill="#e8433f" stroke="${INK}" stroke-width="2.5" stroke-linejoin="round"/><rect x="14" y="-44" width="22" height="20" fill="#9ad8ff" stroke="${INK}" stroke-width="2"/><rect x="54" y="-36" width="22" height="36" rx="3" fill="#a0643a"/></g>`+
+   zh(240,120,.9,'','rise')+bubble(340,58,T('Вжух!'),90,1.8,-24),
+ t:{ru:"<p>Однажды утром Жужа проснулся и сказал:</p><p class=\"say\">— Сегодня я полечу высоко-высоко!</p><p>Вжух! И он взлетел над домиком.</p>",it:"<p>Una mattina Zuzù si svegliò e disse:</p><p class=\"say\">— Oggi volerò in alto, in alto!</p><p>Vuuush! E volò sopra la casetta.</p>",en:"<p>One morning Zhuzha woke up and said:</p><p class=\"say\">“Today I’ll fly high, high up!”</p><p>Whoosh! And he flew over the little house.</p>",es:"<p>Una mañana Zuzú se despertó y dijo:</p><p class=\"say\">—¡Hoy volaré muy, muy alto!</p><p>¡Zuuum! Y voló sobre la casita.</p>"}},
+{s:()=>sky('c','#8fd3ff','#e3f6ff')+cloud(70,250,.9)+cloud(200,40,.6,1)+branch()+bird(290,168)+zh(110,135,.85)+
+   bubble(290,108,T('Чик-чирик! Ты кто?'),188,.4,0)+bubble(120,52,T('Я Жужа! Жжжж!'),158,1.8,-10),
+ t:{ru:"<p>В небе Жужа встретил птичку.</p><p class=\"say\">— Чик-чирик! Ты кто?</p><p class=\"say\">— Я Жужа! Жжжж!</p><p>— А почему у тебя нет крылышек? — Зато у меня пропеллеры!</p>",it:"<p>In cielo Zuzù incontrò un uccellino.</p><p class=\"say\">— Cip-cip! Chi sei?</p><p class=\"say\">— Sono Zuzù! Bzzz!</p><p>— Perché non hai le ali? — Però ho le eliche!</p>",en:"<p>In the sky Zhuzha met a little bird.</p><p class=\"say\">“Tweet-tweet! Who are you?”</p><p class=\"say\">“I’m Zhuzha! Bzzz!”</p><p>“Why don’t you have wings?” “I have propellers instead!”</p>",es:"<p>En el cielo Zuzú conoció a un pajarito.</p><p class=\"say\">—¡Pío-pío! ¿Quién eres?</p><p class=\"say\">—¡Soy Zuzú! ¡Bzzz!</p><p>—¿Por qué no tienes alas? —¡Pero tengo hélices!</p>"}},
+{s:()=>sky('d','#8fd3ff','#e3f6ff')+cloud(80,250,.9)+cloud(220,36,.6,1)+branch()+bird(290,168,1)+zh(135,150,.9,'','twirl')+
+   bubble(300,108,T('Ха-ха-ха!'),120,.3,-10)+bubble(140,42,T('Раз, два, три!'),150,.9,0),
+ t:{ru:"<p>И Жужа закружился: раз, два, три!</p><p>Птичка засмеялась: <span class=\"say\">«Чик-чирик-ха-ха!»</span></p>",it:"<p>E Zuzù fece una giravolta: uno, due, tre!</p><p>L’uccellino rise: <span class=\"say\">«Cip-cip-ah-ah!»</span></p>",en:"<p>And Zhuzha spun around: one, two, three!</p><p>The little bird laughed: <span class=\"say\">“Tweet-tweet-ha-ha!”</span></p>",es:"<p>Y Zuzú dio vueltas: ¡uno, dos, tres!</p><p>El pajarito se rio: <span class=\"say\">«¡Pío-pío-ja-ja!»</span></p>"}},
+{s:()=>sky('e','#a8dcff','#eaf7ff')+cloud(80,40,.7)+cloud(330,60,.5,1)+
+   `<rect x="252" y="128" width="26" height="50" fill="#9a5f35" stroke="${INK}" stroke-width="2.5"/><rect x="80" y="200" width="240" height="100" fill="#ff8c69" stroke="${INK}" stroke-width="2.5"/><path d="M56 208 L200 140 L344 208Z" fill="#c0392b" stroke="${INK}" stroke-width="2.5" stroke-linejoin="round"/><rect x="120" y="222" width="44" height="40" fill="#9ad8ff" stroke="${INK}" stroke-width="2.5"/><rect x="236" y="222" width="44" height="40" fill="#9ad8ff" stroke="${INK}" stroke-width="2.5"/>`+
+   cat(200,144)+zh(320,110,.75,'','escape')+bubble(92,92,T('Мяу! Ты муха?'),150,.4,40),
+ t:{ru:"<p>Полетел Жужа дальше и увидел котика на крыше.</p><p class=\"say\">— Мяу! Ты муха?</p><p class=\"say\">— Нет, я дрон! Жжжж!</p><p>Котик хотел поймать Жужу лапкой, а Жужа — вжух! — и вверх. <span class=\"say\">«Мяу, не поймал!»</span></p>",it:"<p>Zuzù volò più avanti e vide un gattino sul tetto.</p><p class=\"say\">— Miao! Sei una mosca?</p><p class=\"say\">— No, sono un drone! Bzzz!</p><p>Il gattino voleva prenderlo con la zampa, ma Zuzù — vuuush! — su in alto. <span class=\"say\">«Miao, non ti ho preso!»</span></p>",en:"<p>Zhuzha flew on and saw a kitty on a roof.</p><p class=\"say\">“Meow! Are you a fly?”</p><p class=\"say\">“No, I’m a drone! Bzzz!”</p><p>The kitty tried to catch him with a paw, but Zhuzha went whoosh, up and away! <span class=\"say\">“Meow, missed you!”</span></p>",es:"<p>Zuzú siguió volando y vio un gatito en el tejado.</p><p class=\"say\">—¡Miau! ¿Eres una mosca?</p><p class=\"say\">—¡No, soy un dron! ¡Bzzz!</p><p>El gatito quiso atraparlo con la patita, pero Zuzú —¡zuuum!— subió muy alto. <span class=\"say\">«¡Miau, no te atrapé!»</span></p>"}},
+{s:()=>sky('f','#8fd3ff','#e3f6ff')+cloud(300,40,.55,1)+ground()+tree(110,262,1)+boy(290,262)+zh(300,100,.7,'','approach')+
+   bubble(290,40,T('Не плачь! Я помогу!'),196,1.6,0)+bubble(218,138,T('Уа-уа!'),84,.2,24),
+ t:{ru:"<p>Потом Жужа увидел мальчика. Мальчик плакал: его красный мячик застрял на дереве.</p><p class=\"say\">— Не плачь! Я помогу! — сказал Жужа.</p>",it:"<p>Poi Zuzù vide un bambino. Il bambino piangeva: la sua palla rossa era rimasta sull’albero.</p><p class=\"say\">— Non piangere! Ti aiuto io! — disse Zuzù.</p>",en:"<p>Then Zhuzha saw a little boy. The boy was crying: his red ball was stuck in a tree.</p><p class=\"say\">“Don’t cry! I’ll help you!” said Zhuzha.</p>",es:"<p>Luego Zuzú vio a un niño. El niño lloraba: su pelota roja se había quedado en el árbol.</p><p class=\"say\">—¡No llores! ¡Yo te ayudo! —dijo Zuzú.</p>"}},
+{s:()=>sky('g','#8fd3ff','#e3f6ff')+cloud(320,40,.55,1)+ground()+tree(110,262)+zh(185,72,.7,'','nudge')+boy(290,262,1)+
+   bubble(80,36,T('Тук!'),70,.4,20)+bubble(300,40,T('Ура! Спасибо!'),150,1.8,-10),
+ t:{ru:"<p>Жужа толкнул мячик носиком: тук! Мячик упал — бум-бум-бум — прямо мальчику в руки!</p><p class=\"say\">— Ура! Спасибо, Жужа!</p>",it:"<p>Zuzù spinse la palla con il nasino: toc! La palla cadde — bum-bum-bum — proprio tra le mani del bambino!</p><p class=\"say\">— Evviva! Grazie, Zuzù!</p>",en:"<p>Zhuzha pushed the ball with his nose: bonk! The ball fell down, boom-boom-boom, right into the boy’s hands!</p><p class=\"say\">“Yay! Thank you, Zhuzha!”</p>",es:"<p>Zuzú empujó la pelota con la naricita: ¡toc! La pelota cayó —bum-bum-bum— ¡justo en las manos del niño!</p><p class=\"say\">—¡Bien! ¡Gracias, Zuzú!</p>"}},
+{s:()=>room(1)+zh(297,166,.85,'sleep')+
+   [0,1,2].map(k=>`<text class="zzz" style="animation-delay:${k}s" x="326" y="118" font-size="${18+k*4}" font-weight="900" fill="#fff">z</text>`).join(''),
+ t:{ru:"<p>Вечером глазики у Жужи замигали: миг-миг. Он прилетел домой, сел на свою полочку и тихонько прожужжал:</p><p class=\"say\">— Жжж... Какой хороший день...</p><p>И сладко уснул. <b>Конец!</b></p>",it:"<p>La sera gli occhietti di Zuzù fecero blink-blink. Tornò a casa, si posò sulla sua mensola e ronzò piano piano:</p><p class=\"say\">— Bzzz… Che bella giornata…</p><p>E si addormentò. <b>Fine!</b></p>",en:"<p>In the evening Zhuzha’s little eyes went blink-blink. He flew home, landed on his shelf and buzzed softly:</p><p class=\"say\">“Bzzz… What a lovely day…”</p><p>And he fell fast asleep. <b>The End!</b></p>",es:"<p>Por la noche los ojitos de Zuzú hicieron parpadeo-parpadeo. Volvió a casa, se posó en su estante y zumbó bajito:</p><p class=\"say\">—Bzzz… Qué día tan bonito…</p><p>Y se quedó dormidito. <b>¡Fin!</b></p>"}}
+],
+lr:[
+{s:()=>sky('a','#7fcbff','#d9f2ff')+sun(340,55)+cloud(90,60,1)+cloud(250,40,.7,1)+palm(385,250,.9)+ground()+zh(70,120,.5)+
+   kid(160,262,'leo',{r:'out',anim:'hop2'})+kid(240,262,'romeo',{l:'out',anim:'hop2'}),
+ t:{ru:"<h1>Лео и Ромео</h1><p class=\"sub\">Сказка про двух лучших друзей</p><span class=\"hint\">Нажми на Лео или Ромео!</span>",it:"<h1>Leo e Romeo</h1><p class=\"sub\">La storia di due migliori amici</p><span class=\"hint\">Tocca Leo o Romeo!</span>",en:"<h1>Leo and Romeo</h1><p class=\"sub\">A story about two best friends</p><span class=\"hint\">Tap Leo or Romeo!</span>",es:"<h1>Leo y Romeo</h1><p class=\"sub\">Un cuento de dos mejores amigos</p><span class=\"hint\">¡Toca a Leo o a Romeo!</span>"}},
+{s:()=>sky('b','#7fcbff','#d9f2ff')+sun(60,50)+cloud(250,40,.7)+palm(380,255,.9)+ground()+
+   kid(135,262,'leo',{r:'up',anim:'hop'})+kid(265,262,'romeo',{l:'up',anim:'hop',st:'animation-delay:.25s'})+
+   bubble(110,100,T('Привет, Ромео!'),160,.3,20)+bubble(292,58,T('Привет, Лео!'),146,1.3,-24),
+ t:{ru:"<p>Жили-были два лучших друга — Лео и Ромео.</p><p>У Лео тёмные волосы, гладкие-гладкие. А у Ромео — кудряшки, как пружинки: <span class=\"say\">боинг-боинг!</span></p>",it:"<p>C’erano una volta due migliori amici: Leo e Romeo.</p><p>Leo ha i capelli scuri, lisci lisci. Romeo invece ha i riccioli, come tante mollette: <span class=\"say\">boing-boing!</span></p>",en:"<p>Once upon a time there were two best friends: Leo and Romeo.</p><p>Leo has dark hair, smooth and straight. Romeo has curls, bouncy like springs: <span class=\"say\">boing-boing!</span></p>",es:"<p>Había una vez dos mejores amigos: Leo y Romeo.</p><p>Leo tiene el pelo oscuro y lisito. Romeo tiene rizos, como resortitos: <span class=\"say\">¡boing-boing!</span></p>"}},
+{s:()=>sky('c','#8fd3ff','#e3f6ff')+sun(345,50)+cloud(120,50,.7)+bushes()+road()+
+   bike(125,266,'#2f6fe0','leo','ride')+bike(275,266,'#e8433f','romeo','ride')+bubble(300,80,T('Дзынь-дзынь!'),140,.6,-20),
+ t:{ru:"<p>Однажды друзья сели на свои байки. Лео — на синий, Ромео — на красный.</p><p class=\"say\">Дзынь-дзынь! Поехали!</p><p>Колёса крутятся: ш-ш-ш-ш!</p>",it:"<p>Un giorno gli amici salirono sulle loro bici. Leo su quella blu, Romeo su quella rossa.</p><p class=\"say\">Drin-drin! Si parte!</p><p>Le ruote girano: sssss!</p>",en:"<p>One day the friends got on their bikes. Leo on the blue one, Romeo on the red one.</p><p class=\"say\">Ring-ring! Let’s go!</p><p>The wheels spin: shhhhh!</p>",es:"<p>Un día los amigos se subieron a sus bicis. Leo a la azul, Romeo a la roja.</p><p class=\"say\">¡Rin-rin! ¡Vamos!</p><p>Las ruedas giran: ¡shhhh!</p>"}},
+{s:()=>sky('d','#8fd3ff','#e3f6ff')+sun(345,50)+cloud(170,40,.6,1)+`<path d="M0 140 L400 285 V300 H0Z" fill="#9bdc7c"/><path d="M0 170 L400 300 H0Z" fill="#6cc25a"/><path d="M14 140 V100 L40 110 L14 120" fill="#e8433f" stroke="${INK}" stroke-width="2"/>`+
+   `<g transform="translate(0 140) rotate(19.9)"><g class="down">${bike(0,0,'#2f6fe0','leo')}</g><g class="down" style="animation-delay:-2s">${bike(0,0,'#e8433f','romeo')}</g></g>`+
+   bubble(280,70,T('Ура-а-а!'),120,.3,0)+bubble(110,40,T('Вжик!'),80,1,0),
+ t:{ru:"<p>А вот и горка! Вжик — вниз!</p><p>Ветер дует, кудряшки у Ромео прыгают.</p><p class=\"say\">— Ура-а-а! — кричат друзья.</p>",it:"<p>Ecco una discesa! Ziiip, giù!</p><p>Il vento soffia, i riccioli di Romeo saltellano.</p><p class=\"say\">— Evviva! — gridano gli amici.</p>",en:"<p>Here comes a hill! Zoom, down they go!</p><p>The wind blows, and Romeo’s curls bounce.</p><p class=\"say\">“Wheee!” shout the friends.</p>",es:"<p>¡Aquí hay una cuesta! ¡Zas, para abajo!</p><p>Sopla el viento y los rizos de Romeo saltan.</p><p class=\"say\">—¡Yupiii! —gritan los amigos.</p>"}},
+{s:()=>sky('e','#8fd3ff','#e3f6ff')+cloud(70,50,.7)+cloud(330,40,.6,1)+ground()+
+   kid(130,262,'leo',{l:'fwd',r:'fwd',remote:1})+kid(270,262,'romeo',{l:'fwd',r:'fwd',remote:1})+
+   zh(130,92,.55,'','rise2','y')+`<g style="--d:1">${zh(270,82,.55,'','rise2','b')}</g>`+bubble(200,30,T('Полетели!'),120,2,0),
+ t:{ru:"<p>Потом Лео и Ромео взяли пульты. У Лео — жёлтый дрон Жужа, у Ромео — синий дрон Зум.</p><p>Нажали кнопочку — и дроны полетели: <span class=\"say\">жжжж!</span></p>",it:"<p>Poi Leo e Romeo presero i telecomandi. Leo ha il drone giallo Zuzù, Romeo il drone blu Zum.</p><p>Premono il bottoncino e i droni volano via: <span class=\"say\">bzzz!</span></p>",en:"<p>Then Leo and Romeo picked up their remotes. Leo has the yellow drone Zhuzha, Romeo has the blue drone Zoom.</p><p>They press a little button, and the drones fly off: <span class=\"say\">bzzz!</span></p>",es:"<p>Luego Leo y Romeo tomaron los controles. Leo tiene el dron amarillo Zuzú, Romeo el dron azul Zum.</p><p>Aprietan el botoncito y los drones salen volando: <span class=\"say\">¡bzzz!</span></p>"}},
+{s:()=>sky('f','#8fd3ff','#e3f6ff')+cloud(60,250,.8)+ground()+orbit('y',0)+orbit('b',-2.5)+
+   kid(115,262,'leo',{l:'up',r:'up',laugh:1,anim:'hop'})+kid(285,262,'romeo',{l:'up',r:'up',laugh:1,anim:'hop',st:'animation-delay:.25s'})+
+   bubble(345,100,T('Ха-ха!'),90,.5,-20),
+ t:{ru:"<p>Дроны кружатся высоко в небе: вокруг, вокруг и ещё разок!</p><p class=\"say\">— Смотри, как мой Жужа умеет! — А мой Зум тоже!</p><p>Друзья смеются: ха-ха-ха!</p>",it:"<p>I droni girano alti nel cielo: tondo, tondo e ancora una volta!</p><p class=\"say\">— Guarda cosa sa fare il mio Zuzù! — Anche il mio Zum!</p><p>Gli amici ridono: ah-ah-ah!</p>",en:"<p>The drones circle high in the sky: round and round and once more!</p><p class=\"say\">“Look what my Zhuzha can do!” “My Zoom can too!”</p><p>The friends laugh: ha-ha-ha!</p>",es:"<p>Los drones dan vueltas en el cielo: ¡vuelta, vuelta y otra vez!</p><p class=\"say\">—¡Mira lo que sabe hacer mi Zuzú! —¡Mi Zum también!</p><p>Los amigos se ríen: ¡ja-ja-ja!</p>"}},
+{s:()=>pool('g')+kid(140,250,'leo',{pose:'none',l:'up',r:'up',laugh:1})+kid(260,250,'romeo',{pose:'none',l:'up',r:'up',laugh:1})+water('g')+drops(140)+drops(260)+
+   bubble(70,110,T('Плюх!'),80,.2,20)+bubble(330,100,T('Плюх!'),80,.8,-20),
+ t:{ru:"<p>Стало жарко. Друзья побежали в бассейн.</p><p class=\"say\">Плюх! Плюх!</p><p>Брызги во все стороны!</p>",it:"<p>Fa caldo. Gli amici corrono in piscina.</p><p class=\"say\">Splash! Splash!</p><p>Schizzi dappertutto!</p>",en:"<p>It got hot. The friends ran to the pool.</p><p class=\"say\">Splash! Splash!</p><p>Water everywhere!</p>",es:"<p>Hace calor. Los amigos corren a la piscina.</p><p class=\"say\">¡Chof! ¡Chof!</p><p>¡Agua por todas partes!</p>"}},
+{s:()=>pool('h')+kid(140,250,'leo',{pose:'none',l:'up',r:'out',laugh:1})+kid(260,250,'romeo',{pose:'none',l:'out',r:'up'})+water('h')+ring(260,210)+duck(338,214)+drops(200)+
+   zh(105,58,.42,'','','y')+zh(295,52,.42,'','','b')+bubble(345,165,T('Кря-кря!'),90,.6,-10),
+ t:{ru:"<p>Лео и Ромео брызгаются водичкой и плавают с жёлтой уточкой. <span class=\"say\">Кря-кря!</span></p><p>А Жужа и Зум летают над бассейном и тоже радуются.</p>",it:"<p>Leo e Romeo si schizzano l’acqua e nuotano con la paperella gialla. <span class=\"say\">Qua-qua!</span></p><p>E Zuzù e Zum volano sopra la piscina, felici anche loro.</p>",en:"<p>Leo and Romeo splash each other and swim with the yellow ducky. <span class=\"say\">Quack-quack!</span></p><p>And Zhuzha and Zoom fly over the pool, happy too.</p>",es:"<p>Leo y Romeo se salpican agua y nadan con el patito amarillo. <span class=\"say\">¡Cua-cua!</span></p><p>Y Zuzú y Zum vuelan sobre la piscina, felices también.</p>"}},
+{s:()=>sky('i','#ff9f6c','#ffe3b3')+`<circle cx="330" cy="160" r="44" fill="#ffd23f" opacity=".9"/>`+palm(40,232,.9)+palm(372,236,.75)+
+   `<rect y="230" width="400" height="70" fill="#c9a98a"/>${[0,1,2,3,4,5,6,7].map(k=>`<path d="M${k*55} 230 V300" stroke="#b8977a" stroke-width="2"/>`).join('')}<path d="M0 262 H400" stroke="#b8977a" stroke-width="2"/>
+   <rect x="78" y="215" width="10" height="56" rx="4" fill="#e0b000"/><rect x="312" y="215" width="10" height="56" rx="4" fill="#e0b000"/><rect x="60" y="203" width="280" height="17" rx="8" fill="#ffcc2e" stroke="#d9a400" stroke-width="2.5"/>`+
+   zh(92,186,.42,'sleep','','y')+zh(308,186,.42,'sleep','','b')+
+   kid(160,239,'leo',{pose:'sit',r:'out'})+kid(240,239,'romeo',{pose:'sit',l:'out'})+
+   bubble(110,68,T('Завтра поиграем?'),176,.4,40)+bubble(300,82,T('Конечно!'),110,1.6,-50),
+ t:{ru:"<p>Вечером друзья сели на жёлтую скамеечку. Дроны Жужа и Зум уже спят.</p><p class=\"say\">— Завтра опять поиграем?<br>— Конечно! Ведь мы лучшие друзья!</p><p><b>Конец!</b></p>",it:"<p>La sera gli amici si siedono sulla panchina gialla. I droni Zuzù e Zum dormono già.</p><p class=\"say\">— Domani giochiamo ancora?<br>— Certo! Siamo migliori amici!</p><p><b>Fine!</b></p>",en:"<p>In the evening the friends sit on the yellow bench. The drones Zhuzha and Zoom are already asleep.</p><p class=\"say\">“Shall we play again tomorrow?”<br>“Of course! We’re best friends!”</p><p><b>The End!</b></p>",es:"<p>Por la tarde los amigos se sientan en el banco amarillo. Los drones Zuzú y Zum ya duermen.</p><p class=\"say\">—¿Jugamos mañana otra vez?<br>—¡Claro! ¡Somos mejores amigos!</p><p><b>¡Fin!</b></p>"}}
+],
+lw:[
+{s:()=>sky('a','#7fcbff','#d9f2ff')+sun(340,55)+cloud(80,55,.9)+palm(30,250,.8)+ground()+heart(200,95,1.5)+
+   kid(160,262,'leo',{r:'out',anim:'hop2'})+kid(240,262,'romeo',{l:'out',anim:'hop2'})+dog(330,262,.75)+louie(62,262,.5),
+ t:{ru:"<h1>Лео ждёт Ромео</h1><p class=\"sub\">Сказка про двух лучших друзей</p><span class=\"hint\">Нажми на героев!</span>",it:"<h1>Leo aspetta Romeo</h1><p class=\"sub\">La storia di due migliori amici</p><span class=\"hint\">Tocca i personaggi!</span>",en:"<h1>Leo Waits for Romeo</h1><p class=\"sub\">A story about two best friends</p><span class=\"hint\">Tap the characters!</span>",es:"<h1>Leo espera a Romeo</h1><p class=\"sub\">Un cuento de dos mejores amigos</p><span class=\"hint\">¡Toca a los personajes!</span>"}},
+{s:()=>sky('b','#7fcbff','#d9f2ff')+cloud(260,40,.6,1)+plane(0,40,.8,'flyR')+ground()+
+   kid(52,262,'leo',{r:'up',s:.9,anim:'hop'})+kid(160,262,'romeo',{l:'up'})+kid(222,262,'mom1',{s:1.25})+suitcase(258,262)+kid(298,262,'mom2',{s:1.25,l:'fwd',r:'fwd'})+baby(298,190,1)+dog(355,262,.72)+
+   bubble(70,82,T('Пока, Ромео!'),130,.3,-10)+bubble(185,66,T('Чао!'),70,1.3,-20),
+ t:{ru:"<p>Однажды Ромео уехал далеко-далеко — в Италию.</p><p>С ним поехали мамы Джулия и Эрика, маленькая сестрёнка Матильда и большой чёрный пёс Панико. <span class=\"say\">Гав!</span></p><p class=\"say\">— Пока, Лео! — помахал Ромео.</p>",it:"<p>Un giorno Romeo è partito lontano lontano, per l’Italia.</p><p>Con lui sono partite le mamme Giulia ed Erika, la sorellina Matilda e il grande cane nero Panico. <span class=\"say\">Bau!</span></p><p class=\"say\">— Ciao, Leo! — saluta Romeo con la mano.</p>",en:"<p>One day Romeo went far, far away, all the way to Italy.</p><p>His moms Giulia and Erika went too, with baby sister Matilda and Panico, the big black dog. <span class=\"say\">Woof!</span></p><p class=\"say\">“Bye, Leo!” Romeo waved.</p>",es:"<p>Un día Romeo se fue lejos, muy lejos: a Italia.</p><p>Se fueron con él sus mamás Giulia y Erika, la hermanita Matilda y el perrazo negro Panico. <span class=\"say\">¡Guau!</span></p><p class=\"say\">—¡Adiós, Leo! —dijo Romeo con la mano.</p>"}},
+{s:()=>sky('c','#a9d8f5','#e8f4fb')+`<rect y="170" width="400" height="40" fill="#5fb3e0"/><path d="M0 176 H400" stroke="#d6effb" stroke-width="2"/>`+cloud(90,50,.7)+palm(360,240,.85)+
+   `<rect y="205" width="400" height="95" fill="#f6dca8"/>`+bench(100,200)+kid(150,239,'leo',{pose:'sit',r:'up',laugh:1})+heart(250,186,.45)+louie(330,272,.55)+
+   bubble(160,70,T('Ромео, я жду тебя!'),180,.6,-10),
+ t:{ru:"<p>А Лео остался в Лонг-Бич.</p><p>Он сидит на жёлтой скамеечке, а рядом весёлый пёс Луи виляет хвостиком: <span class=\"say\">гав-гав!</span></p><p class=\"say\">— Ромео сейчас в Италии! Я скучаю, но мы скоро снова поиграем! — улыбается Лео.</p>",it:"<p>Leo invece è rimasto a Long Beach.</p><p>È seduto sulla panchina gialla e accanto a lui il cane Louie scodinzola felice: <span class=\"say\">bau-bau!</span></p><p class=\"say\">— Romeo adesso è in Italia! Mi manca, ma presto giocheremo di nuovo! — sorride Leo.</p>",en:"<p>Leo stayed home in Long Beach.</p><p>He sits on the yellow bench, and happy Louie the dog wags his tail: <span class=\"say\">woof-woof!</span></p><p class=\"say\">“Romeo is in Italy now! I miss him, but we’ll play again soon!” Leo smiles.</p>",es:"<p>Leo se quedó en Long Beach.</p><p>Está sentado en el banco amarillo y a su lado el perrito Louie mueve la colita: <span class=\"say\">¡guau-guau!</span></p><p class=\"say\">—¡Romeo ahora está en Italia! Lo extraño, ¡pero pronto jugaremos otra vez! —sonríe Leo.</p>"}},
+{s:()=>sky('d','#7fcbff','#d9f2ff')+sun(40,40)+ground()+slide()+swingSet(kid(0,145,'leo',{pose:'sit',s:.8}))+
+   thought(282,82,kid(282,122,'romeo',{s:.38,l:'up'})+`<circle cx="254" cy="106" r="4" fill="#ff5a7a"/>`),
+ t:{ru:"<p>Лео гуляет на детской площадке в Лагун-парке.</p><p>Качели летают: <span class=\"say\">вверх-вниз, вверх-вниз!</span></p><p>А Лео вспоминает, как они играли тут вместе с Ромео.</p>",it:"<p>Leo gioca al parco giochi di Lagoon Park.</p><p>L’altalena vola: <span class=\"say\">su e giù, su e giù!</span></p><p>E Leo ricorda quando giocava qui con Romeo.</p>",en:"<p>Leo plays at the playground in Lagoon Park.</p><p>The swing flies: <span class=\"say\">up and down, up and down!</span></p><p>And Leo remembers playing here with Romeo.</p>",es:"<p>Leo juega en el parque infantil de Lagoon Park.</p><p>El columpio vuela: <span class=\"say\">¡arriba y abajo, arriba y abajo!</span></p><p>Y Leo recuerda cuando jugaba aquí con Romeo.</p>"}},
+{s:()=>sky('e','#8fd3ff','#e3f6ff')+cloud(120,45,.7)+cloud(300,60,.5,1)+field()+
+   kid(100,262,'leo',{anim:'hop2'})+kid(250,262,'romeo',{anim:'hop2',st:'animation-delay:.45s'})+`<g transform="translate(125 252)"><g class="pass">${soccer(10)}</g></g>`+
+   bubble(320,130,T('Гол!'),70,1.4,10)+bubble(110,95,T('Пас!'),70,.4,0),
+ t:{ru:"<p>Он вспоминает, как они вместе ходили на футбол.</p><p class=\"say\">Бум — пас! Бум — гол!</p><p>— Ура! — кричали друзья.</p>",it:"<p>Ricorda quando andavano insieme a giocare a calcio.</p><p class=\"say\">Bum, passaggio! Bum, gol!</p><p>— Evviva! — gridavano gli amici.</p>",en:"<p>He remembers when they played soccer together.</p><p class=\"say\">Boom, a pass! Boom, a goal!</p><p>“Hooray!” the friends shouted.</p>",es:"<p>Recuerda cuando iban juntos a jugar al fútbol.</p><p class=\"say\">¡Bum, pase! ¡Bum, gol!</p><p>—¡Bien! —gritaban los amigos.</p>"}},
+{s:()=>sky('f','#7fcbff','#d9f2ff')+sun(200,45)+sea()+kid(160,238,'leo',{pose:'none',l:'up',r:'up',laugh:1})+kid(250,238,'romeo',{pose:'none',l:'up',r:'up',laugh:1})+seaFront()+drops(160).replaceAll('cy="204"','cy="208"')+drops(250).replaceAll('cy="204"','cy="208"')+
+   sand()+kid(52,292,'mom1',{s:1.2,r:'up'})+kid(348,292,'mom2',{s:1.2,l:'up'})+bubble(205,92,T('Плюх!'),80,.4,0),
+ t:{ru:"<p>А ещё вспоминает, как они ходили с мамами купаться.</p><p class=\"say\">Плюх! Плюх!</p><p>Волны, брызги и смех: ха-ха-ха!</p>",it:"<p>E ricorda anche quando andavano a fare il bagno con le mamme.</p><p class=\"say\">Splash! Splash!</p><p>Onde, schizzi e risate: ah-ah-ah!</p>",en:"<p>He also remembers going swimming with their moms.</p><p class=\"say\">Splash! Splash!</p><p>Waves, splashes and giggles: ha-ha-ha!</p>",es:"<p>Y también recuerda cuando iban a bañarse con las mamás.</p><p class=\"say\">¡Chof! ¡Chof!</p><p>Olas, salpicones y risas: ¡ja-ja-ja!</p>"}},
+{s:()=>`<rect width="400" height="300" fill="#ffe2a8"/>`+[0,1,2,3].map(r=>[0,1,2,3,4,5,6,7,8].map(c=>`<circle cx="${20+c*46+(r%2)*23}" cy="${22+r*58}" r="4" fill="#ffd47e"/>`).join('')).join('')+`<rect y="250" width="400" height="50" fill="#e0a36a"/>`+
+   kid(80,262,'leo',{r:'out',laugh:1,anim:'hop'})+lenny(150,252,.55)+phone(255,152,sky('pg','#9ad8ff','#e3f6ff')+`<path d="M180 170 Q230 140 330 165 V260 H180Z" fill="#9bd37a"/>`+cypress(300,170,.6)+kid(255,262,'romeo',{s:.72,l:'up',laugh:1})+`<path d="M190 60 H320 M255 40 V250" stroke="#fff" stroke-width="4" opacity=".7"/>`,'pc')+
+   bubble(150,24,T('Дзынь-дзынь!'),130,0,40)+bubble(80,92,T('Привет, Ромео!'),150,1.2,10),
+ t:{ru:"<p>Однажды телефон зазвонил: <span class=\"say\">дзынь-дзынь!</span></p><p>Это Ромео по видеосвязи! Кот Ленни тоже смотрит: <span class=\"say\">мяу!</span></p><p class=\"say\">— Привет, Лео! — Привет, Ромео!</p>",it:"<p>Un giorno il telefono squilla: <span class=\"say\">drin-drin!</span></p><p>È Romeo in videochiamata! Anche il gatto Lenny guarda: <span class=\"say\">miao!</span></p><p class=\"say\">— Ciao, Leo! — Ciao, Romeo!</p>",en:"<p>One day the phone rang: <span class=\"say\">ring-ring!</span></p><p>It’s Romeo on a video call! Lenny the cat watches too: <span class=\"say\">meow!</span></p><p class=\"say\">“Hi, Leo!” “Hi, Romeo!”</p>",es:"<p>Un día sonó el teléfono: <span class=\"say\">¡rin-rin!</span></p><p>¡Es Romeo por videollamada! El gato Lenny también mira: <span class=\"say\">¡miau!</span></p><p class=\"say\">—¡Hola, Leo! —¡Hola, Romeo!</p>"}},
+{s:()=>sky('g','#8fd3ff','#e3f6ff')+sun(350,40)+cloud(120,40,.6,1)+italyHills()+`<rect y="258" width="400" height="42" fill="#b9a088"/><path class="dash" d="M-40 266 H440" stroke="#7a5a3a" stroke-width="8" stroke-dasharray="6 12"/><path d="M0 260 H400" stroke="#555" stroke-width="3"/>`+
+   trainCar('tw')+bubble(110,74,T('Чух-чух!'),100,.4,10)+bubble(268,78,T('Скучаю по тебе!'),170,1.4,-68),
+ t:{ru:"<p class=\"say\">— Смотри, я еду на поезде! Чух-чух!</p><p>За окном горы и деревья, а рядом мамы Джулия и Эрика, сестрёнка Матильда и Панико.</p><p class=\"say\">— Я очень скучаю по тебе, Лео!</p>",it:"<p class=\"say\">— Guarda, sono sul treno! Ciuf-ciuf!</p><p>Fuori dal finestrino ci sono colline e alberi, e vicino ci sono le mamme Giulia ed Erika, la sorellina Matilda e Panico.</p><p class=\"say\">— Mi manchi tanto, Leo!</p>",en:"<p class=\"say\">“Look, I’m on a train! Choo-choo!”</p><p>Outside the window there are hills and trees, and next to him are his moms Giulia and Erika, baby sister Matilda and Panico.</p><p class=\"say\">“I miss you so much, Leo!”</p>",es:"<p class=\"say\">—¡Mira, voy en tren! ¡Chu-chu!</p><p>Por la ventana se ven colinas y árboles, y a su lado están sus mamás Giulia y Erika, la hermanita Matilda y Panico.</p><p class=\"say\">—¡Te extraño mucho, Leo!</p>"}},
+{s:()=>sky('h','#ffa36c','#ffe3b3')+`<circle cx="320" cy="170" r="46" fill="#ffd23f" opacity=".9"/>`+plane(0,110,.7,'flyL',-1)+palm(30,250,.8)+palm(372,252,.7)+ground()+heart(52,128,.7)+kid(116,262,'alicia',{s:1.25,r:'up'})+kid(290,262,'david',{s:1.3,l:'up'})+louie(40,262,.48)+lenny(362,262,.5)+
+   kid(200,262,'leo',{l:'up',r:'up',laugh:1,anim:'hop2'})+bubble(200,48,T('Возвращайся скорей!'),200,.5,0),
+ t:{ru:"<p>Лео очень-очень ждёт своего друга обратно. И мама Алисия, и папа Давид, и пёс Луи, и кот Ленни — все ждут!</p><p>Скоро-скоро Ромео вернётся, и они снова будут играть вместе каждый день!</p><p><b>Конец!</b></p>",it:"<p>Leo aspetta tanto tanto il suo amico. Anche mamma Alicia, papà David, il cane Louie e il gatto Lenny: tutti aspettano!</p><p>Presto presto Romeo tornerà, e giocheranno di nuovo insieme ogni giorno!</p><p><b>Fine!</b></p>",en:"<p>Leo can’t wait for his friend to come back. Mommy Alicia, Daddy David, Louie the dog and Lenny the cat are all waiting too!</p><p>Very soon Romeo will be back, and they will play together every day again!</p><p><b>The End!</b></p>",es:"<p>Leo espera muchísimo a su amigo. ¡Y mamá Alicia, papá David, el perrito Louie y el gato Lenny también lo esperan!</p><p>Muy pronto Romeo volverá, ¡y jugarán juntos otra vez todos los días!</p><p><b>¡Fin!</b></p>"}}
+]
+};
+
+let SND_LABEL=UI().snd;
+let i=0,BK='zhuzha';
+/* ---------- scene audio: music + sound effects, synthesized ---------- */
+const AU={on:true,started:false,ctx:null,master:null,bus:null,timers:[],srcs:[],nb:null};
+function getCtx(){if(!AU.ctx){AU.ctx=new (window.AudioContext||window.webkitAudioContext)();AU.master=AU.ctx.createGain();AU.master.gain.value=AU.on?.9:0;AU.master.connect(AU.ctx.destination);}
+  if(AU.ctx.state==='suspended')AU.ctx.resume();return AU.ctx;}
+const m2f=m=>440*Math.pow(2,(m-69)/12);
+function nbuf(){if(AU.nb)return AU.nb;const c=AU.ctx,b=c.createBuffer(1,c.sampleRate*2,c.sampleRate),d=b.getChannelData(0);for(let k=0;k<d.length;k++)d[k]=Math.random()*2-1;return AU.nb=b;}
+function later(ms,fn){const id=setTimeout(fn,ms);AU.timers.push(id);}
+function every(min,max,fn,first){const go=()=>{fn();later(min+Math.random()*(max-min),go);};later(first??min,go);}
+function keep(n){AU.srcs.push(n);return n;}
+function env(g,t,peak,a,d){g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(peak,t+a);g.gain.exponentialRampToValueAtTime(.0001,t+a+d);}
+function tone(f,type,peak,a,d,when=0,to,dest=AU.bus){const c=AU.ctx,t=c.currentTime+when,o=c.createOscillator(),g=c.createGain();o.type=type;o.frequency.setValueAtTime(f,t);if(to)o.frequency.exponentialRampToValueAtTime(to,t+a+d);env(g,t,peak,a,d);o.connect(g);g.connect(dest);o.start(t);o.stop(t+a+d+.05);}
+function burst(type,f,q,peak,a,d,when=0,f2){const c=AU.ctx,t=c.currentTime+when,s=c.createBufferSource(),fl=c.createBiquadFilter(),g=c.createGain();s.buffer=nbuf();fl.type=type;fl.frequency.setValueAtTime(f,t);if(f2)fl.frequency.exponentialRampToValueAtTime(f2,t+a+d);fl.Q.value=q;env(g,t,peak,a,d);s.connect(fl);fl.connect(g);g.connect(AU.bus);s.start(t,Math.random());s.stop(t+a+d+.05);}
+function bed(type,f,q,vol,lfoRate=0,lfoDepth=0,gRate=0){const c=AU.ctx,s=keep(c.createBufferSource()),fl=c.createBiquadFilter(),g=c.createGain();s.buffer=nbuf();s.loop=true;fl.type=type;fl.frequency.value=f;fl.Q.value=q;g.gain.value=vol;
+  if(lfoRate){const l=keep(c.createOscillator()),lg=c.createGain();l.frequency.value=lfoRate;lg.gain.value=lfoDepth;l.connect(lg);lg.connect(fl.frequency);l.start();}
+  if(gRate){const l=keep(c.createOscillator()),lg=c.createGain();l.frequency.value=gRate;lg.gain.value=vol*.6;l.connect(lg);lg.connect(g.gain);l.start();}
+  s.connect(fl);fl.connect(g);g.connect(AU.bus);s.start(0,Math.random());}
+function buzzBed(f,vol,rise){const c=AU.ctx,t=c.currentTime,o=keep(c.createOscillator()),l=keep(c.createOscillator()),w=keep(c.createOscillator()),lg=c.createGain(),wg=c.createGain(),fl=c.createBiquadFilter(),g=c.createGain();
+  o.type='sawtooth';o.frequency.setValueAtTime(rise?f*.5:f,t);if(rise)o.frequency.linearRampToValueAtTime(f,t+1.8);l.frequency.value=27;lg.gain.value=f*.18;w.frequency.value=.35;wg.gain.value=f*.12;
+  l.connect(lg);lg.connect(o.frequency);w.connect(wg);wg.connect(o.frequency);fl.type='lowpass';fl.frequency.value=1100;
+  g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(vol,t+.8);o.connect(fl);fl.connect(g);g.connect(AU.bus);o.start();l.start();w.start();}
+/* sound effects */
+const chirp=()=>{const n=2+Math.floor(Math.random()*3),b=2600+Math.random()*900;for(let k=0;k<n;k++)tone(b,'sine',.05,.01,.09,k*.13,b*1.45);};
+const bell=()=>[0,.22].forEach(w=>[2350,3520,5150].forEach((f,k)=>tone(f,'sine',[.09,.05,.03][k],.003,1.1,w)));
+const whoosh=()=>burst('bandpass',300,.8,.22,.5,.7,0,2400);
+const splash=(v=.3)=>{burst('bandpass',1300,.5,v,.01,.55);burst('highpass',3000,.7,v*.5,.01,.3,.05);for(let k=0;k<3;k++)tone(700+Math.random()*500,'sine',.05,.005,.08,.2+k*.12,1600);};
+const quack=()=>[0,.26].forEach(w=>{const c=AU.ctx,t=c.currentTime+w,o=c.createOscillator(),f1=c.createBiquadFilter(),g=c.createGain();o.type='sawtooth';o.frequency.setValueAtTime(330,t);o.frequency.exponentialRampToValueAtTime(230,t+.17);f1.type='bandpass';f1.frequency.value=1100;f1.Q.value=2.5;env(g,t,.22,.01,.17);o.connect(f1);f1.connect(g);g.connect(AU.bus);o.start(t);o.stop(t+.22);});
+const cricket=()=>{for(let k=0;k<3;k++)tone(4400,'sine',.025,.004,.035,k*.075);};
+const boing=()=>tone(260,'sine',.08,.01,.35,0,620);
+/* music: 16 eighth-note steps, gentle and simple */
+const SONG={
+  sunny:{bpm:108,wave:'triangle',dec:.38,vol:.07,mel:[72,76,79,76,77,76,74,72,74,77,81,77,79,74,72,0],bass:[48,0,55,0,53,0,55,0,50,0,57,0,55,0,48,0]},
+  ride:{bpm:132,wave:'triangle',dec:.25,vol:.06,mel:[72,72,76,79,77,77,74,0,74,74,77,81,79,76,72,0],bass:[48,55,48,55,53,57,53,57,50,57,50,57,55,59,48,0]},
+  sky:{bpm:100,wave:'sine',dec:.6,vol:.07,mel:[79,0,76,79,81,0,79,76,77,0,74,77,79,0,76,0],bass:[48,0,0,0,53,0,0,0,50,0,0,0,55,0,0,0]},
+  pool:{bpm:104,wave:'triangle',dec:.3,vol:.065,mel:[67,71,74,79,74,71,67,71,69,72,76,81,76,72,69,72],bass:[43,0,0,0,43,0,0,0,45,0,0,0,45,0,0,0]},
+  lull:{bpm:64,wave:'sine',dec:1.4,vol:.06,mel:[79,76,72,76,77,74,71,74,76,72,69,72,74,71,67,0],bass:[48,0,0,0,50,0,0,0,45,0,0,0,43,0,0,0]}};
+function music(name){const s=SONG[name],c=AU.ctx,step=60/s.bpm/2,bus=AU.bus;let n=0,next=c.currentTime+.3;
+  const tick=()=>{if(AU.bus!==bus)return;while(next<c.currentTime+.2){const k=n%16;
+      if(s.mel[k]){tone(m2f(s.mel[k]),s.wave,s.vol,.012,s.dec,next-c.currentTime);tone(m2f(s.mel[k]+12),'sine',s.vol*.15,.01,s.dec*.6,next-c.currentTime);}
+      if(s.bass[k])tone(m2f(s.bass[k]),'sine',s.vol*1.2,.02,step*3,next-c.currentTime);
+      next+=step;n++;}
+    later(60,tick);};tick();}
+/* extra effects for this book */
+const bark=()=>[0,.3].forEach(w=>{tone(380,'sawtooth',.08,.008,.12,w,220);burst('bandpass',700,2,.12,.005,.1,w);});
+const meow=()=>{const c=AU.ctx,t=c.currentTime,o=c.createOscillator(),f=c.createBiquadFilter(),g=c.createGain();o.type='triangle';o.frequency.setValueAtTime(520,t);o.frequency.linearRampToValueAtTime(860,t+.18);o.frequency.linearRampToValueAtTime(470,t+.55);f.type='bandpass';f.frequency.value=1300;f.Q.value=1;env(g,t,.25,.05,.55);o.connect(f);f.connect(g);g.connect(AU.bus);o.start(t);o.stop(t+.65);};
+const creak=()=>tone(480,'sine',.025,.06,.3,0,620);
+const kick=()=>{tone(140,'sine',.25,.005,.18,0,50);burst('lowpass',900,.7,.12,.005,.08);};
+const whistle=()=>[0,.22].forEach(w=>tone(2750,'sine',.05,.01,.16,w));
+const phoneRing=()=>{for(let r=0;r<3;r++)for(let k=0;k<6;k++)tone(k%2?1320:990,'triangle',.05,.005,.07,r*.9+k*.08);};
+const chug=()=>{burst('bandpass',420,1.2,.14,.01,.14);burst('bandpass',380,1.2,.09,.01,.12,.18);};
+const clack=()=>{tone(900,'square',.02,.002,.03);tone(800,'square',.02,.002,.03,.1);};
+const toot=()=>{tone(523,'square',.025,.03,.6);tone(659,'square',.02,.03,.6);};
+const seagull=()=>[0,.35].forEach(w=>tone(1500,'triangle',.03,.05,.3,w,1000));
+const jet=()=>burst('lowpass',180,.7,.16,1.6,2.6,0,700);
+const waves=()=>bed('lowpass',420,.7,.06,0,0,.12);
+/* one entry per page, in page order */
+
+const SC={
+ zhuzha:[
+  ()=>{music('sunny');every(2500,5000,chirp,600);},
+  ()=>{music('sunny');buzzBed(150,.015);},
+  ()=>{music('sky');buzzBed(160,.025,1);later(1700,whoosh);},
+  ()=>{music('sky');buzzBed(160,.015);every(1500,3500,chirp,300);},
+  ()=>{music('sky');buzzBed(160,.015);every(2400,2400,whoosh,200);every(2000,4000,chirp,900);},
+  ()=>{music('sunny');buzzBed(160,.015);every(3000,3000,meow,500);},
+  ()=>{music('sunny');buzzBed(160,.015);every(3000,6000,chirp,1500);},
+  ()=>{music('sunny');buzzBed(160,.015);later(300,boing);later(1500,boing);later(1800,boing);},
+  ()=>{music('lull');every(1200,2600,cricket,500);}],
+ lr:[
+  ()=>{music('sunny');every(2500,5000,chirp,600);},
+  ()=>{music('sunny');every(2500,5000,chirp,900);later(400,boing);later(1500,boing);},
+  ()=>{music('ride');bed('lowpass',260,1,.05,0,0,6);bed('bandpass',700,.7,.035,.15,350);every(4500,6500,bell,800);},
+  ()=>{music('ride');bed('bandpass',900,.6,.06,.2,500,.25);every(4000,4000,whoosh,100);later(1200,bell);},
+  ()=>{music('sky');buzzBed(150,.025,1);buzzBed(185,.02,1);every(3500,6000,chirp,2500);},
+  ()=>{music('sky');buzzBed(150,.025);buzzBed(190,.02);bed('bandpass',700,.7,.02,.12,250);},
+  ()=>{music('pool');bed('lowpass',500,.7,.04,0,0,.2);later(300,()=>splash(.32));later(1100,()=>splash(.3));every(2200,4000,()=>splash(.18),2600);},
+  ()=>{music('pool');bed('lowpass',500,.7,.04,0,0,.2);buzzBed(150,.012);every(3500,5500,quack,700);every(3000,5000,()=>splash(.14),1800);},
+  ()=>{music('lull');every(1200,2600,cricket,500);}],
+ lw:[
+  ()=>{music('sunny');every(2500,5000,chirp,600);later(1500,bark);},
+  ()=>{music('sunny');later(200,jet);every(4500,7000,bark,1600);},
+  ()=>{music('sunny');waves();every(5000,8000,seagull,1500);later(1200,bark);},
+  ()=>{music('sunny');every(1400,1400,creak,300);every(3000,6000,chirp,1200);},
+  ()=>{music('ride');every(2000,2000,kick,50);later(2300,whistle);},
+  ()=>{music('pool');waves();every(2200,4000,()=>splash(.2),400);every(5000,8000,seagull,2500);},
+  ()=>{phoneRing();later(2800,()=>music('sky'));later(4200,meow);},
+  ()=>{music('ride');every(600,600,chug,100);every(900,900,clack,400);every(7000,9000,toot,800);},
+  ()=>{music('sky');every(3000,6000,chirp,800);later(400,jet);later(2500,bark);later(4000,meow);}]};
+let SCENES=SC.zhuzha;
+function playScene(n){if(!AU.started)return;const c=getCtx();
+  if(AU.bus){const old=AU.bus,olds=AU.srcs;old.gain.setTargetAtTime(0,c.currentTime,.12);setTimeout(()=>{olds.forEach(x=>{try{x.stop()}catch(e){}});old.disconnect();},700);}
+  AU.timers.forEach(clearTimeout);AU.timers=[];AU.srcs=[];
+  AU.bus=c.createGain();AU.bus.gain.setValueAtTime(0,c.currentTime);AU.bus.gain.linearRampToValueAtTime(1,c.currentTime+.5);AU.bus.connect(AU.master);
+  try{SCENES[n]&&SCENES[n]();}catch(e){}}
+const sndBtn=document.getElementById('snd');
+function paintSnd(){sndBtn.classList.toggle('off',!AU.on);sndBtn.setAttribute('aria-label',AU.on?SND_LABEL[0]:SND_LABEL[1]);}
+function startAudio(){if(AU.started)return;AU.started=true;getCtx();if(!document.getElementById('reader').hidden)playScene(i);}
+document.addEventListener('pointerdown',()=>{if(AU.on)startAudio();},{capture:true});
+sndBtn.addEventListener('click',e=>{e.stopPropagation();AU.on=!AU.on;if(AU.on){startAudio();}
+  if(AU.ctx)AU.master.gain.setTargetAtTime(AU.on?.9:0,AU.ctx.currentTime,.05);paintSnd();});
+
+
+function sound(kind){try{const c=getCtx();const b=AU.bus;AU.bus=AU.master;
+  if(kind==='dog')bark();else if(kind==='cat')meow();
+  else if(kind==='drone'){const t=c.currentTime,o=c.createOscillator(),g=c.createGain(),l=c.createOscillator(),lg=c.createGain();o.type='sawtooth';o.frequency.value=150;l.frequency.value=26;lg.gain.value=35;l.connect(lg);lg.connect(o.frequency);g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.1,t+.05);g.gain.setValueAtTime(.1,t+.5);g.gain.linearRampToValueAtTime(0,t+.75);o.connect(g);g.connect(c.destination);l.start(t);l.stop(t+.8);o.start(t);o.stop(t+.8);}
+  else boing();
+  AU.bus=b;}catch(e){}}
+function tap(z){z.classList.remove('shake');void z.getBoundingClientRect();z.classList.add('shake');setTimeout(()=>z.classList.remove('shake'),650);
+  bz.textContent=z.dataset.tap;bz.classList.remove('on');void bz.offsetWidth;bz.classList.add('on');sound(z.dataset.snd);}
+
+/* ---------- reader ---------- */
+const pages=()=>BOOKS[BK];
+function show(n,dir=1){
+  const P=pages();i=Math.max(0,Math.min(P.length-1,n));
+  stage.innerHTML=`<svg viewBox="0 0 400 300" role="img" aria-label="${UI().pic} ${i+1}">${P[i].s()}</svg>`;
+  const last=i===P.length-1;
+  txt.innerHTML=P[i].t[LANG]+(last?`<p class="credit">${UI().credit}</p>`:'');
+  [...dots.children].forEach((d,k)=>d.classList.toggle('on',k===i));
+  prev.disabled=i===0;
+  next.innerHTML=last?AGAIN:ARROW;next.classList.toggle('again',last);next.setAttribute('aria-label',last?UI().again:UI().next);
+  page.style.setProperty('--from',dir>0?'30px':'-30px');page.style.setProperty('--rot',dir>0?'1deg':'-1deg');
+  page.classList.remove('turn');void page.offsetWidth;page.classList.add('turn');
+  playScene(i);
+}
+function openBook(b){BK=b;$('rtitle').textContent=UI().books[b][0];SCENES=SC[b];dots.innerHTML=pages().map(()=>'<i></i>').join('');
+  $('home').hidden=true;$('reader').hidden=false;window.scrollTo(0,0);show(0);}
+let sx=null;
+stage.addEventListener('pointerdown',e=>{sx=e.clientX;});
+stage.addEventListener('pointerup',e=>{if(sx===null)return;const dx=e.clientX-sx;sx=null;
+  if(Math.abs(dx)>50){show(i+(dx<0?1:-1),dx<0?1:-1);return;}
+  const z=e.target.closest&&e.target.closest('[data-tap]');if(z)tap(z);});
+prev.addEventListener('click',()=>show(i-1,-1));
+next.addEventListener('click',()=>show(i===pages().length-1?0:i+1,1));
+document.addEventListener('keydown',e=>{if($('reader').hidden)return;if(e.key==='ArrowRight')show(i+1,1);if(e.key==='ArrowLeft')show(i-1,-1);});
+$('homeBtn').addEventListener('click',()=>{location.hash=LANG;});
+
+/* ---------- home ---------- */
+const svg=(vb,body,par='')=>`<svg viewBox="${vb}" ${par} aria-hidden="true">${body}</svg>`;
+const COVER={zhuzha:()=>sky('a','#7fcbff','#d9f2ff')+sun(330,60)+cloud(80,60,1)+ground()+zh(200,150,1.45),
+  lr:()=>sky('b','#7fcbff','#d9f2ff')+sun(340,55)+cloud(90,60,1)+palm(385,250,.9)+ground()+zh(70,120,.5)+zh(320,130,.4,'','','b')+kid(160,262,'leo',{r:'out',anim:'hop2'})+kid(240,262,'romeo',{l:'out',anim:'hop2'}),
+  lw:()=>sky('c','#7fcbff','#d9f2ff')+sun(340,55)+cloud(80,55,.9)+palm(30,250,.8)+ground()+heart(200,95,1.5)+plane(0,40,.6,'flyR')+kid(160,262,'leo',{r:'out',anim:'hop2'})+kid(240,262,'romeo',{l:'out',anim:'hop2'})+dog(330,262,.75)+louie(62,262,.5)};
+function renderHome(){
+  const u=UI();document.documentElement.lang=LANG;document.title=u.title;
+  $('hTitle').textContent=u.title;$('hLead').textContent=u.lead;$('hTip').textContent=u.tip;$('hCredit').textContent=u.credit;
+  $('langbar').setAttribute('aria-label',u.langs);
+  $('langbar').innerHTML=LANGS.map(([c,b,n])=>`<button data-l="${c}" aria-pressed="${c===LANG}"><b>${b}</b>${n}</button>`).join('');
+  $('shelf').innerHTML=Object.keys(BOOKS).map(k=>`<a class="card" href="#${LANG}-${k}"><div class="cover">${svg('0 0 400 300',COVER[k]())}</div><h2>${u.books[k][0]}</h2><p>${u.books[k][1]}</p><span class="go">${u.read}</span></a>`).join('');
+  $('hero').innerHTML=svg('0 0 800 350',`<defs><linearGradient id="hs" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7fcbff"/><stop offset="1" stop-color="#d9f2ff"/></linearGradient></defs><rect width="800" height="350" fill="url(#hs)"/>`+sun(720,70)+cloud(120,70,1)+cloud(420,50,.8,1)+cloud(640,150,.6)+
+    `<path d="M0 290 Q200 250 400 285 T800 275 V350 H0Z" fill="#9bdc7c"/><path d="M0 315 Q220 295 440 318 T800 310 V350 H0Z" fill="#6cc25a"/>`+palm(60,320,1)+palm(760,325,.9)+
+    `<g class="flyR" style="animation-duration:14s">${zh(0,140,.7)}</g>`+kid(330,322,'leo',{r:'out',anim:'hop2'})+kid(410,322,'romeo',{l:'out',anim:'hop2'})+dog(520,322,.7)+louie(250,322,.5)+lenny(590,322,.5),'preserveAspectRatio="xMidYMax slice"');
+}
+function applyLang(){const u=UI();SND_LABEL=u.snd;paintSnd();prev.setAttribute('aria-label',u.prev);$('homeBtn').setAttribute('aria-label',u.home);$('note').textContent=u.note;}
+$('langbar').addEventListener('click',e=>{const b=e.target.closest('button');if(b)location.hash=b.dataset.l;});
+$('hero').addEventListener('pointerup',e=>{const z=e.target.closest&&e.target.closest('[data-tap]');if(z){startAudio();tap(z);}});
+function route(){
+  const h=location.hash.slice(1),[l,b]=h.split('-');
+  if(UIS[l]&&l!==LANG){LANG=l;}
+  try{localStorage.setItem('leoLang',LANG);}catch(e){}
+  applyLang();
+  if(b&&BOOKS[b]){openBook(b);}
+  else{playScene(-1);$('reader').hidden=true;$('home').hidden=false;renderHome();}
+}
+window.addEventListener('hashchange',route);
+route();
+}
+</script>
+</body></html>
