@@ -126,7 +126,7 @@ nav button.again{background:var(--red);color:#fff;box-shadow:0 5px 0 #a3201d}
 .breathe{animation:breathe 3.2s ease-in-out infinite}
 .bounce{animation:bounce .9s cubic-bezier(.3,0,.7,1) infinite}@keyframes bounce{0%,100%{transform:translateY(40px)}50%{transform:translateY(-40px)}}
 [hidden]{display:none!important}
-.hero{position:relative;height:clamp(190px,32vw,300px);width:100%;background:#a9dcff;overflow:hidden;border-radius:0 0 34px 34px}
+.hero{position:relative;aspect-ratio:2/1;max-height:440px;width:100%;background:#a9dcff;overflow:hidden;border-radius:0 0 34px 34px}
 .hero svg{position:absolute;inset:0;width:100%;height:100%}
 .wrap{max-width:900px;margin:0 auto;padding:0 clamp(12px,3vw,24px) 36px}
 .home{color:var(--ink)}.home h1{font-size:clamp(36px,7vw,54px);line-height:1.05;font-weight:900;margin:22px 0 6px;text-wrap:balance}
@@ -846,9 +846,15 @@ function renderHome(){
   $('langbar').setAttribute('aria-label',u.langs);
   $('langbar').innerHTML=LANGS.map(([c,b,n])=>`<button data-l="${c}" aria-pressed="${c===LANG}"><b>${b}</b>${n}</button>`).join('');
   $('shelf').innerHTML=Object.keys(BOOKS).map(k=>`<a class="card" href="#${LANG}-${k}"><div class="cover">${svg('0 0 400 300',COVER[k]())}</div><h2>${u.books[k][0]}</h2><p>${u.books[k][1]}</p><span class="go">${u.read}</span></a>`).join('');
-  $('hero').innerHTML=svg('0 0 800 350',`<defs><linearGradient id="hs" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7fcbff"/><stop offset="1" stop-color="#d9f2ff"/></linearGradient></defs><rect width="800" height="350" fill="url(#hs)"/>`+sun(720,70)+cloud(120,70,1)+cloud(420,50,.8,1)+cloud(640,150,.6)+
-    `<path d="M0 290 Q200 250 400 285 T800 275 V350 H0Z" fill="#9bdc7c"/><path d="M0 315 Q220 295 440 318 T800 310 V350 H0Z" fill="#6cc25a"/>`+palm(60,320,1)+palm(760,325,.9)+
-    `<g class="flyR" style="animation-duration:14s">${zh(0,140,.7)}</g>`+kid(330,322,'leo',{r:'out',anim:'hop2'})+kid(410,322,'romeo',{l:'out',anim:'hop2'})+dog(520,322,.7)+louie(250,322,.5)+lenny(590,322,.5),'preserveAspectRatio="xMidYMax slice"');
+  $('hero').innerHTML=svg('0 0 800 400',`<defs><linearGradient id="hs" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7fcbff"/><stop offset="1" stop-color="#d9f2ff"/></linearGradient></defs><rect width="800" height="400" fill="url(#hs)"/>`+sun(740,105)+cloud(110,95,.9)+cloud(420,80,.7,1)+cloud(640,120,.5)+
+    `<path d="M0 300 Q200 262 400 292 T800 284 V400 H0Z" fill="#9bdc7c"/>`+palm(20,330,.9)+palm(785,335,.85)+
+    `<g class="flyR" style="animation-duration:16s">${zh(0,118,.55)}</g>`+zh(560,122,.45,'','','b')+
+    kid(60,300,'tawe',{s:.95,r:'up',laugh:1})+kid(125,300,'juan',{s:.98,laugh:1})+kid(190,300,'erikaT',{s:.95,l:'up',laugh:1})+
+    kid(610,300,'mom1',{s:.95,l:'fwd',r:'fwd',laugh:1})+baby(610,244,.8)+kid(675,300,'mom2',{s:.95,r:'up',laugh:1})+kid(742,300,'rory',{s:.95,l:'up'})+
+    kid(355,300,'alicia',{s:1,r:'out',laugh:1})+kid(445,300,'david',{s:1.02,l:'out',laugh:1})+
+    `<path d="M0 340 Q200 322 400 338 T800 334 V400 H0Z" fill="#6cc25a"/>`+
+    lenny(245,388,.5)+louie(315,388,.55,'hop')+kid(400,388,'leo',{s:1.12,r:'out',laugh:1,anim:'hop2'})+kid(485,388,'romeo',{l:'out',laugh:1,anim:'hop2'})+
+    dog(575,388,.6)+kolobok(660,384,.75,'hop'),'preserveAspectRatio="xMidYMax slice"');
 }
 function applyLang(){const u=UI();SND_LABEL=u.snd;paintSnd();prev.setAttribute('aria-label',u.prev);$('homeBtn').setAttribute('aria-label',u.home);$('note').textContent=u.note;}
 $('langbar').addEventListener('click',e=>{const b=e.target.closest('button');if(b)location.hash=b.dataset.l;});
